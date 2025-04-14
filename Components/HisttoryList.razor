@@ -1,0 +1,36 @@
+@using NetworkMonitorBlazor.Models
+
+<ul class="history-list">
+    @foreach (var history in Histories)
+    {
+        <li class="history-item @(history.SessionId == CurrentSessionId ? "active" : "")">
+            <div class="history-content" @onclick="() => OnSelectSession.InvokeAsync(history.SessionId)">
+                <div class="history-name">@history.DisplayName</div>
+                <div class="history-details">
+                    <span class="history-type">@history.LLMType</span>
+                    <span class="history-time">@history.Timestamp</span>
+                </div>
+            </div>
+            <button class="delete-button" @onclick="() => OnDeleteSession.InvokeAsync(history.SessionId)">
+                <CloseIcon />
+            </button>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public List<ChatHistory> Histories { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSelectSession { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnDeleteSession { get; set; }
+
+    [Parameter]
+    public string LLMType { get; set; }
+
+    [Parameter]
+    public string CurrentSessionId { get; set; }
+}

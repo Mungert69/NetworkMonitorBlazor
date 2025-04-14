@@ -1,0 +1,37 @@
+@using NetworkMonitorBlazor.Services
+@using NetworkMonitorBlazor.Models
+@inject ChatStateService ChatState
+@inject WebSocketService WebSocketService
+@inject AudioService AudioService
+
+<ChatContent @ref="chatContentRef"
+             OnHostLinkClick="OnHostLinkClick"
+             IsDashboard="@IsDashboard"
+             InitRunnerType="@InitRunnerType"
+             SetIsChatOpen="@SetIsChatOpen"
+             SiteId="@SiteId" />
+
+@code {
+    private ChatContent? chatContentRef;
+
+    [Parameter]
+    public EventCallback<HostLink> OnHostLinkClick { get; set; }
+
+    [Parameter]
+    public bool IsDashboard { get; set; }
+
+    [Parameter]
+    public string InitRunnerType { get; set; } = "TurboLLM";
+
+    [Parameter]
+    public EventCallback<bool> SetIsChatOpen { get; set; }
+
+    [Parameter]
+    public string SiteId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await WebSocketService.Initialize(SiteId);
+        ChatState.Initialize(InitRunnerType);
+    }
+}

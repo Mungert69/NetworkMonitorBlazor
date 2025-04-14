@@ -1,0 +1,25 @@
+@page "/"
+@namespace NetworkMonitorBlazor.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Monitor</title>
+    <base href="~/" />
+    <!-- Your existing head content -->
+</head>
+<body>
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    <!-- Add this right before the Blazor script -->
+    <script src="/js/chatInterop.js"></script>
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>
