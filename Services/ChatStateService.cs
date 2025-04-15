@@ -30,8 +30,7 @@ namespace NetworkMonitorBlazor.Services
         public bool ShowHelpMessage { get; set; } = false;
         public string HelpMessage { get; set; } = "";
         public string CurrentMessage { get; set; } = "";
-        public string LLMFeedback { get; set; } = "";
-        public bool IsDashboard { get; set; }
+               public bool IsDashboard { get; set; }
         public ChatMessage Message { get; set; } = new ChatMessage 
         { 
             Info = "init", 
@@ -39,9 +38,31 @@ namespace NetworkMonitorBlazor.Services
             Text = "Internal Error" 
         };
 
+        // In ChatStateService.cs
+public string LLMFeedback 
+{
+    get => _llmFeedback;
+    set
+    {
+        _llmFeedback = value;
+        NotifyStateChanged();
+    }
+}
+private string _llmFeedback = string.Empty;
+
+public List<ChatHistory> Histories
+{
+    get => _histories;
+    set
+    {
+        _histories = value;
+        NotifyStateChanged();
+    }
+}
+private List<ChatHistory> _histories = new();
+
         // Data states
-        public List<ChatHistory> Histories { get; set; } = new List<ChatHistory>();
-        public List<HostLink> LinkData { get; set; } = new List<HostLink>();
+               public List<HostLink> LinkData { get; set; } = new List<HostLink>();
         public string LLMRunnerType { get; set; } = "TurboLLM";
         public bool IsHoveringMessages { get; set; } = false;
         public bool IsInputFocused { get; set; } = false;

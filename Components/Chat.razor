@@ -31,6 +31,16 @@
     [Parameter]
     public string SiteId { get; set; }
 
+  protected override void OnInitialized()
+    {
+        ChatState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ChatState.OnChange -= StateHasChanged;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         try 
