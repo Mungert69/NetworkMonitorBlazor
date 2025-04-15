@@ -3,6 +3,7 @@
 @inject ChatStateService ChatState
 @inject WebSocketService WebSocketService
 @inject AudioService AudioService
+@inject IJSRuntime JSRuntime
 
 <ChatContent @ref="chatContentRef"
              OnHostLinkClick="OnHostLinkClick"
@@ -13,6 +14,7 @@
 
 @code {
     private ChatContent? chatContentRef;
+    private bool _isInitialized = false;
 
     [Parameter]
     public EventCallback<HostLink> OnHostLinkClick { get; set; }
@@ -31,7 +33,64 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await WebSocketService.Initialize(SiteId);
-        ChatState.Initialize(InitRunnerType);
+        try 
+        {
+            // Initialize chat state first to get session ID
+            await ChatState.Initialize(InitRunnerType);
+            
+            // Initialize WebSocket with the obtained session ID
+            await WebSocketService.Initialize(SiteId, ChatState.SessionId);
+            
+            // Verify connection
+            await VerifyConnection();
+            
+            _isInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Initialization failed: {ex}");
+            await RecoverFromError();
+        }
+    }
+
+    private async Task VerifyConnection()
+    {
+        // Send verification message
+        await WebSocketService.SendMessage($"<|VERIFY_SESSION|{ChatState.SessionId}|>");
+        
+        // Add timeout check
+        await Task.Delay(2000); // Wait 2 seconds for response
+    }
+
+    private async Task RecoverFromError()
+    {
+        // Clear any existing session
+        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
+        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
+        
+        // Retry initialization
+        await OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _isInitialized)
+        {
+            // Load any initial messages or history
+            await LoadInitialState();
+        }
+    }
+
+    private async Task LoadInitialState()
+    {
+        try 
+        {
+            // Request session history if needed
+            await WebSocketService.SendMessage($"<|REQUEST_HISTORY|{ChatState.SessionId}|>");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to load initial state: {ex}");
+        }
     }
 }

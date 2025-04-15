@@ -59,12 +59,22 @@ namespace NetworkMonitorBlazor.Services
             _jsRuntime = jsRuntime;
         }
 
-        public async Task Initialize(string initRunnerType)
-        {
-            LLMRunnerType = initRunnerType;
-            LLMRunnerTypeRef = initRunnerType;
-            SessionId = await GetSessionId();
-        }
+
+public async Task Initialize(string initRunnerType)
+{
+    LLMRunnerType = initRunnerType;
+    LLMRunnerTypeRef = initRunnerType;
+    SessionId = await CreateNewSession();
+    OnChange?.Invoke();
+}
+
+private async Task<string> CreateNewSession()
+{
+    var newSessionId = Guid.NewGuid().ToString();
+    await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
+    await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
+    return newSessionId;
+}
 
         private async Task<string> GetSessionId()
         {
@@ -94,7 +104,8 @@ namespace NetworkMonitorBlazor.Services
             return newSessionId;
         }
 
-        public event Action OnChange;
+       public event Action? OnChange = null; // Mark as nullable
+
 
         public void NotifyStateChanged() => OnChange?.Invoke();
     }

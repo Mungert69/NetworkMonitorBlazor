@@ -576,17 +576,17 @@
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"notf2xhcfb"},{"Name":"integrity","Value":"sha256-\u002BUW802wgVfnjaSbdwyHLlU7AVplb0WToOlvN1CnzIac="},{"Name":"label","Value":"_content/NetworkMonitorBlazor/lib/bootstrap/dist/js/bootstrap.js"}]]]></EndpointProperties>
       <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"145401"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022\u002BUW802wgVfnjaSbdwyHLlU7AVplb0WToOlvN1CnzIac=\u0022"},{"Name":"Last-Modified","Value":"Tue, 15 Apr 2025 21:04:56 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
-    <StaticWebAssetEndpoint Include="_content/NetworkMonitorBlazor/NetworkMonitorBlazor.8zroe9j31a.bundle.scp.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\NetworkMonitorBlazor.8zroe9j31a.bundle.scp.css'))</AssetFile>
-      <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"8zroe9j31a"},{"Name":"integrity","Value":"sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY\u002BGPyGM="},{"Name":"label","Value":"_content/NetworkMonitorBlazor/NetworkMonitorBlazor.bundle.scp.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"5760"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY\u002BGPyGM=\u0022"},{"Name":"Last-Modified","Value":"Tue, 15 Apr 2025 21:40:33 GMT"}]]]></ResponseHeaders>
-    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/NetworkMonitorBlazor/NetworkMonitorBlazor.bundle.scp.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\NetworkMonitorBlazor.8zroe9j31a.bundle.scp.css'))</AssetFile>
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\NetworkMonitorBlazor.y8uvdn8gna.bundle.scp.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY\u002BGPyGM="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"5760"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY\u002BGPyGM=\u0022"},{"Name":"Last-Modified","Value":"Tue, 15 Apr 2025 21:40:33 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-HuyrXDswy3yfaXTGLrPUGOhebpc1qewILmGSclUUoLU="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"4257"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022HuyrXDswy3yfaXTGLrPUGOhebpc1qewILmGSclUUoLU=\u0022"},{"Name":"Last-Modified","Value":"Tue, 15 Apr 2025 22:03:01 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/NetworkMonitorBlazor/NetworkMonitorBlazor.y8uvdn8gna.bundle.scp.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\NetworkMonitorBlazor.y8uvdn8gna.bundle.scp.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"y8uvdn8gna"},{"Name":"integrity","Value":"sha256-HuyrXDswy3yfaXTGLrPUGOhebpc1qewILmGSclUUoLU="},{"Name":"label","Value":"_content/NetworkMonitorBlazor/NetworkMonitorBlazor.bundle.scp.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"4257"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022HuyrXDswy3yfaXTGLrPUGOhebpc1qewILmGSclUUoLU=\u0022"},{"Name":"Last-Modified","Value":"Tue, 15 Apr 2025 22:03:01 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
   </ItemGroup>
 </Project>

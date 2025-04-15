@@ -34,11 +34,31 @@ namespace NetworkMonitorBlazor.Services
 
 
 
-        public async Task Initialize(string siteId)
-        {
-            await ConnectWebSocket();
-        }
-
+     public async Task Initialize(string siteId, string sessionId)
+{
+    _siteId = siteId;
+    CurrentSessionId = sessionId;
+    
+    // Rest of your initialization code
+    await ConnectWebSocket();
+    
+    // Send initialization message with both IDs
+    var timeZone = TimeZoneInfo.Local.Id;
+    var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{sessionId}";
+    await Send(sendStr);
+}
+public async Task<bool> VerifySession()
+{
+    try
+    {
+        await Send($"<|VERIFY_SESSION|{CurrentSessionId}|>");
+        return true;
+    }
+    catch
+    {
+        return false;
+    }
+}
         private async Task ConnectWebSocket()
         {
             try
