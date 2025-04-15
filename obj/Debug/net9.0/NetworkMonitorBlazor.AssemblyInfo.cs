@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NetworkMonitorBlazor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5790e8a06fb54877df1c2e9ca37d7921c2aa1429")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+afbcd76a6605719975cf706f5c1bbfb3408f3d04")]
 [assembly: System.Reflection.AssemblyProductAttribute("NetworkMonitorBlazor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NetworkMonitorBlazor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -353,4 +353,6 @@ nohup.out
 /wwwroot/files/*
 /data/*
 /.mono
+/bin/*
+/obj/*
 appsettings*
