@@ -72,15 +72,23 @@
         await OnInitializedAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (firstRender)
     {
-        if (firstRender && _isInitialized)
-        {
-            // Load any initial messages or history
-            await LoadInitialState();
-        }
+        // Initialize ChatState FIRST
+        await ChatState.Initialize(InitRunnerType);
+        
+        // THEN initialize WebSocket with BOTH parameters
+        await WebSocketService.Initialize(SiteId, ChatState.SessionId);  // Add sessionId
     }
 
+    // Keep your existing auto-scroll logic
+    if (ChatState.AutoScrollEnabled)
+    {
+        //await JSRuntime.InvokeVoidAsync("scrollToBottom", outputContainerRef);
+    }
+}
     private async Task LoadInitialState()
     {
         try 
@@ -93,4 +101,30 @@
             Console.Error.WriteLine($"Failed to load initial state: {ex}");
         }
     }
+
+    private async Task ResetSessionId()
+{
+    await WebSocketService.SendMessage("<|REMOVE_SESSION|>");
+    
+    // Clear existing session
+    await ChatState.ClearSession();  // Use ChatState's new method
+    
+    // Create new session
+    await ChatState.Initialize(InitRunnerType);
+    
+    // Reinitialize WebSocket
+    await WebSocketService.Initialize(SiteId, ChatState.SessionId);
+}
+
+private async Task ResetLLM()
+{
+    await WebSocketService.SendMessage("<|REMOVE_SESSION|>");
+    
+    // Clear and recreate session
+    await ChatState.ClearSession();
+    await ChatState.Initialize(InitRunnerType);
+    
+    // Reinitialize WebSocket
+    await WebSocketService.Initialize(SiteId, ChatState.SessionId);
+}
 }

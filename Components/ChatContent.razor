@@ -203,14 +203,16 @@
     public EventCallback<bool> SetIsChatOpen { get; set; }
 
     [Parameter]
-    public string SiteId { get; set; }
+    public string SiteId { get; set; }="";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await WebSocketService.Initialize(SiteId);
-            ChatState.Initialize(InitRunnerType);
+            await ChatState.Initialize(InitRunnerType);
+        
+        // THEN initialize WebSocket with BOTH parameters
+        await WebSocketService.Initialize(SiteId, ChatState.SessionId);
         }
 
         if (ChatState.AutoScrollEnabled)

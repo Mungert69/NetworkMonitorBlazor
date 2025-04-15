@@ -67,7 +67,13 @@ public async Task Initialize(string initRunnerType)
     SessionId = await CreateNewSession();
     OnChange?.Invoke();
 }
-
+  public async Task ClearSession()
+    {
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
+        SessionId = string.Empty;
+        OnChange?.Invoke();
+    }
 private async Task<string> CreateNewSession()
 {
     var newSessionId = Guid.NewGuid().ToString();

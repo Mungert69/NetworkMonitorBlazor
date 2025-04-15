@@ -18,40 +18,48 @@ namespace NetworkMonitorBlazor.Services
         private readonly IJSRuntime _jsRuntime;
         private readonly AudioService _audioService;
         private CancellationTokenSource _cancellationTokenSource;
-        private readonly string _siteId;
-        private readonly ILLMService _llmService;
+      private string _siteId; // Remove readonly since we need to assign it later
+    private readonly ILLMService _llmService;
+    private string _currentSessionId; // Add this field
 
-        public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
+         public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
+    {
+        _chatState = chatState;
+        _jsRuntime = jsRuntime;
+        _audioService = audioService;
+        _cancellationTokenSource = new CancellationTokenSource();
+        _llmService = llmService;
+        _siteId = string.Empty;
+        _currentSessionId = string.Empty;
+    }
+
+    public async Task Initialize(string siteId, string sessionId)
+    {
+        _siteId = siteId;
+        _currentSessionId = sessionId;
+        
+        try
         {
-            _chatState = chatState;
-            _jsRuntime = jsRuntime;
-            _audioService = audioService;
-            _cancellationTokenSource = new CancellationTokenSource();
-              _siteId = string.Empty; 
-              _llmService=llmService;
+            await ConnectWebSocket();
+            var timeZone = TimeZoneInfo.Local.Id;
+            var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{sessionId}";
+            await Send(sendStr);
+            Console.WriteLine($"WebSocket initialized for session: {sessionId}");
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
+            await Reconnect();
+        }
+    }
 
 
-
-
-     public async Task Initialize(string siteId, string sessionId)
-{
-    _siteId = siteId;
-    CurrentSessionId = sessionId;
-    
-    // Rest of your initialization code
-    await ConnectWebSocket();
-    
-    // Send initialization message with both IDs
-    var timeZone = TimeZoneInfo.Local.Id;
-    var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{sessionId}";
-    await Send(sendStr);
-}
+     
 public async Task<bool> VerifySession()
 {
     try
     {
-        await Send($"<|VERIFY_SESSION|{CurrentSessionId}|>");
+        await Send($"<|VERIFY_SESSION|{_currentSessionId}|>");
         return true;
     }
     catch
@@ -416,7 +424,7 @@ public async Task<bool> VerifySession()
         {
             // Wait before reconnecting
             await Task.Delay(5000, _cancellationTokenSource.Token);
-            await Initialize(_siteId);
+            await Initialize(_siteId, _currentSessionId);
         }
 
         public void Dispose()
