@@ -353,6 +353,8 @@ nohup.out
 /wwwroot/files/*
 /data/*
 /.mono
-/bin/*
-/obj/*
 appsettings*
+# Ignore all bin and obj folders recursively
+**/bin/
+**/obj/
+
