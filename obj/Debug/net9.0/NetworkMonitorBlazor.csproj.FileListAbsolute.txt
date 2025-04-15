@@ -37,8 +37,6 @@
 /home/mahadeva/code/NetworkMonitorBlazor/bin/Debug/net9.0/Microsoft.Extensions.Primitives.dll
 /home/mahadeva/code/NetworkMonitorBlazor/bin/Debug/net9.0/Microsoft.JSInterop.dll
 /home/mahadeva/code/NetworkMonitorBlazor/bin/Debug/net9.0/System.Net.ServerSentEvents.dll
-/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/Components/Layout/MainLayout.razor.rz.scp.css
-/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/Components/Layout/NavMenu.razor.rz.scp.css
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/bundle/NetworkMonitorBlazor.styles.css
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/projectbundle/NetworkMonitorBlazor.bundle.scp.css
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zvvhz1szlp-1m1aghsjtz.gz
@@ -89,8 +87,6 @@
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/ozwgieg947-h1s4sie4z3.gz
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/o4y09a72wn-63fj8s7r0e.gz
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/qstts6g5xb-0j3bgjxly4.gz
-/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-s3a6czstv5.gz
-/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-s3a6czstv5.gz
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/staticwebassets.build.json
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/staticwebassets.development.json
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/staticwebassets.build.endpoints.json
@@ -108,3 +104,7 @@
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/ref/NetworkMonitorBlazor.dll
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/sb4v5zdp28-a45wiw3leq.gz
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/NetworkMonitorBlazor.sourcelink.json
+/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/Shared/MainLayout.razor.rz.scp.css
+/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/Shared/NavMenu.razor.rz.scp.css
+/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-8zroe9j31a.gz
+/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-8zroe9j31a.gz

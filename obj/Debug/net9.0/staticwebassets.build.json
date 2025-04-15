@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "dJvSDv5m9pkQPCF8iAVm1ejHrn3lnsuejBlwIM3uM0E=",
+  "Hash": "D6azWVbJwPyqR7psQGcMdC5/1Wa3waw8ioFSxRytFjg=",
   "Source": "NetworkMonitorBlazor",
   "BasePath": "_content/NetworkMonitorBlazor",
   "Mode": "Default",
@@ -815,12 +815,12 @@
       "OriginalItemSpec": "/home/mahadeva/code/NetworkMonitorBlazor/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.js"
     },
     {
-      "Identity": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-s3a6czstv5.gz",
+      "Identity": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-8zroe9j31a.gz",
       "SourceId": "NetworkMonitorBlazor",
       "SourceType": "Computed",
       "ContentRoot": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/NetworkMonitorBlazor",
-      "RelativePath": "NetworkMonitorBlazor#[.{fingerprint=s3a6czstv5}]?.styles.css.gz",
+      "RelativePath": "NetworkMonitorBlazor#[.{fingerprint=8zroe9j31a}]?.styles.css.gz",
       "AssetKind": "All",
       "AssetMode": "CurrentProject",
       "AssetRole": "Alternative",
@@ -829,8 +829,8 @@
       "RelatedAsset": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/bundle/NetworkMonitorBlazor.styles.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "41z5zaouzv",
-      "Integrity": "aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=",
+      "Fingerprint": "o2d7trjyf6",
+      "Integrity": "8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/bundle/NetworkMonitorBlazor.styles.css"
@@ -1088,12 +1088,12 @@
       "OriginalItemSpec": "/home/mahadeva/code/NetworkMonitorBlazor/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.min.js"
     },
     {
-      "Identity": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-s3a6czstv5.gz",
+      "Identity": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-8zroe9j31a.gz",
       "SourceId": "NetworkMonitorBlazor",
       "SourceType": "Computed",
       "ContentRoot": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/NetworkMonitorBlazor",
-      "RelativePath": "NetworkMonitorBlazor#[.{fingerprint=s3a6czstv5}]!.bundle.scp.css.gz",
+      "RelativePath": "NetworkMonitorBlazor#[.{fingerprint=8zroe9j31a}]!.bundle.scp.css.gz",
       "AssetKind": "All",
       "AssetMode": "Reference",
       "AssetRole": "Alternative",
@@ -1102,8 +1102,8 @@
       "RelatedAsset": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/projectbundle/NetworkMonitorBlazor.bundle.scp.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "41z5zaouzv",
-      "Integrity": "aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=",
+      "Fingerprint": "o2d7trjyf6",
+      "Integrity": "8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/projectbundle/NetworkMonitorBlazor.bundle.scp.css"
@@ -1144,8 +1144,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "ScopedCss",
       "AssetTraitValue": "ApplicationBundle",
-      "Fingerprint": "s3a6czstv5",
-      "Integrity": "WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=",
+      "Fingerprint": "8zroe9j31a",
+      "Integrity": "pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/bundle/NetworkMonitorBlazor.styles.css"
@@ -1165,8 +1165,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "ScopedCss",
       "AssetTraitValue": "ProjectBundle",
-      "Fingerprint": "s3a6czstv5",
-      "Integrity": "WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=",
+      "Fingerprint": "8zroe9j31a",
+      "Integrity": "pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/projectbundle/NetworkMonitorBlazor.bundle.scp.css"
@@ -16544,13 +16544,13 @@
       ]
     },
     {
-      "Route": "NetworkMonitorBlazor.bundle.scp.css",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-s3a6czstv5.gz",
+      "Route": "NetworkMonitorBlazor.8zroe9j31a.bundle.scp.css",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-8zroe9j31a.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000564971751"
+          "Quality": "0.000566572238"
         }
       ],
       "ResponseHeaders": [
@@ -16560,19 +16560,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1769"
+          "Value": "1764"
         },
         {
           "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
-          "Value": "no-cache"
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Encoding",
@@ -16588,18 +16588,26 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
+          "Value": "W/\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
         }
       ],
       "EndpointProperties": [
         {
+          "Name": "fingerprint",
+          "Value": "8zroe9j31a"
+        },
+        {
+          "Name": "label",
+          "Value": "NetworkMonitorBlazor.bundle.scp.css"
+        },
+        {
           "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
         }
       ]
     },
     {
-      "Route": "NetworkMonitorBlazor.bundle.scp.css",
+      "Route": "NetworkMonitorBlazor.8zroe9j31a.bundle.scp.css",
       "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/projectbundle/NetworkMonitorBlazor.bundle.scp.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -16609,7 +16617,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "5782"
+          "Value": "5760"
         },
         {
           "Name": "Content-Type",
@@ -16617,121 +16625,21 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
+          "Value": "\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
-        }
-      ]
-    },
-    {
-      "Route": "NetworkMonitorBlazor.bundle.scp.css.gz",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-s3a6czstv5.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1769"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE="
-        }
-      ]
-    },
-    {
-      "Route": "NetworkMonitorBlazor.s3a6czstv5.bundle.scp.css",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-s3a6czstv5.gz",
-      "Selectors": [
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip",
-          "Quality": "0.000564971751"
-        }
-      ],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1769"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
           "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "W/\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "s3a6czstv5"
+          "Value": "8zroe9j31a"
         },
         {
           "Name": "label",
@@ -16739,13 +16647,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
         }
       ]
     },
     {
-      "Route": "NetworkMonitorBlazor.s3a6czstv5.bundle.scp.css",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/projectbundle/NetworkMonitorBlazor.bundle.scp.css",
+      "Route": "NetworkMonitorBlazor.8zroe9j31a.bundle.scp.css.gz",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-8zroe9j31a.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -16754,7 +16662,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "5782"
+          "Value": "1764"
         },
         {
           "Name": "Content-Type",
@@ -16762,56 +16670,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "s3a6czstv5"
-        },
-        {
-          "Name": "label",
-          "Value": "NetworkMonitorBlazor.bundle.scp.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
-        }
-      ]
-    },
-    {
-      "Route": "NetworkMonitorBlazor.s3a6czstv5.bundle.scp.css.gz",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-s3a6czstv5.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1769"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16829,7 +16692,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "s3a6czstv5"
+          "Value": "8zroe9j31a"
         },
         {
           "Name": "label",
@@ -16837,18 +16700,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE="
+          "Value": "sha256-8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0="
         }
       ]
     },
     {
-      "Route": "NetworkMonitorBlazor.s3a6czstv5.styles.css",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-s3a6czstv5.gz",
+      "Route": "NetworkMonitorBlazor.8zroe9j31a.styles.css",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-8zroe9j31a.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000564971751"
+          "Quality": "0.000566572238"
         }
       ],
       "ResponseHeaders": [
@@ -16858,15 +16721,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1769"
+          "Value": "1764"
         },
         {
           "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16886,13 +16749,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
+          "Value": "W/\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "s3a6czstv5"
+          "Value": "8zroe9j31a"
         },
         {
           "Name": "label",
@@ -16900,12 +16763,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
         }
       ]
     },
     {
-      "Route": "NetworkMonitorBlazor.s3a6czstv5.styles.css",
+      "Route": "NetworkMonitorBlazor.8zroe9j31a.styles.css",
       "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/bundle/NetworkMonitorBlazor.styles.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -16915,7 +16778,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "5782"
+          "Value": "5760"
         },
         {
           "Name": "Content-Type",
@@ -16923,11 +16786,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
+          "Value": "\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16937,7 +16800,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "s3a6czstv5"
+          "Value": "8zroe9j31a"
         },
         {
           "Name": "label",
@@ -16945,13 +16808,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
         }
       ]
     },
     {
-      "Route": "NetworkMonitorBlazor.s3a6czstv5.styles.css.gz",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-s3a6czstv5.gz",
+      "Route": "NetworkMonitorBlazor.8zroe9j31a.styles.css.gz",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-8zroe9j31a.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -16960,7 +16823,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1769"
+          "Value": "1764"
         },
         {
           "Name": "Content-Type",
@@ -16968,11 +16831,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16990,7 +16853,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "s3a6czstv5"
+          "Value": "8zroe9j31a"
         },
         {
           "Name": "label",
@@ -16998,18 +16861,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE="
+          "Value": "sha256-8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0="
         }
       ]
     },
     {
-      "Route": "NetworkMonitorBlazor.styles.css",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-s3a6czstv5.gz",
+      "Route": "NetworkMonitorBlazor.bundle.scp.css",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-8zroe9j31a.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000564971751"
+          "Quality": "0.000566572238"
         }
       ],
       "ResponseHeaders": [
@@ -17019,15 +16882,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1769"
+          "Value": "1764"
         },
         {
           "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -17047,13 +16910,150 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
+          "Value": "W/\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
+        }
+      ]
+    },
+    {
+      "Route": "NetworkMonitorBlazor.bundle.scp.css",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/scopedcss/projectbundle/NetworkMonitorBlazor.bundle.scp.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "5760"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
+        }
+      ]
+    },
+    {
+      "Route": "NetworkMonitorBlazor.bundle.scp.css.gz",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/zgtggs3xby-8zroe9j31a.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1764"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0="
+        }
+      ]
+    },
+    {
+      "Route": "NetworkMonitorBlazor.styles.css",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-8zroe9j31a.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000566572238"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1764"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
         }
       ]
     },
@@ -17068,7 +17068,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "5782"
+          "Value": "5760"
         },
         {
           "Name": "Content-Type",
@@ -17076,11 +17076,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY=\""
+          "Value": "\"pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -17090,13 +17090,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-WI+9ef/ZKLvarNjEcyCj4RJfVgdSE3XKbvbRPQq0kTY="
+          "Value": "sha256-pCWq6wtrqBIEOZ5Q7odqhoQGu0TVFUED2SYsY+GPyGM="
         }
       ]
     },
     {
       "Route": "NetworkMonitorBlazor.styles.css.gz",
-      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-s3a6czstv5.gz",
+      "AssetFile": "/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/r9oi4nsujy-8zroe9j31a.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -17105,7 +17105,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1769"
+          "Value": "1764"
         },
         {
           "Name": "Content-Type",
@@ -17113,11 +17113,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE=\""
+          "Value": "\"8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 21:04:56 GMT"
+          "Value": "Tue, 15 Apr 2025 21:40:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -17135,7 +17135,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-aFT8WAI+m2+BUaApITHX+lN4UjWUxvs8gOWRt5lo+PE="
+          "Value": "sha256-8HbFC8DP/hImvuTIzmnrVZsFhPyKaovxoCW9RjvPfP0="
         }
       ]
     }
