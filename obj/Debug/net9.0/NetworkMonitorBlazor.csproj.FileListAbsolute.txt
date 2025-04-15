@@ -107,3 +107,4 @@
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/NetworkMonitorBlazor.genruntimeconfig.cache
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/ref/NetworkMonitorBlazor.dll
 /home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/compressed/sb4v5zdp28-a45wiw3leq.gz
+/home/mahadeva/code/NetworkMonitorBlazor/obj/Debug/net9.0/NetworkMonitorBlazor.sourcelink.json
