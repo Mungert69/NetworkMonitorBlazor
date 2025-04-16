@@ -1,11 +1,12 @@
-/* Variables for theming */
 :root {
-    --primary: #2563eb;
-    --primary-light: #3b82f6;
-    --primary-dark: #1d4ed8;
-    --secondary: #64748b;
-    --danger: #ef4444;
-    --success: #10b981;
+    --primary: #607466;
+    --primary-light: #7a8f7d;
+    --primary-dark: #4d5d52;
+    --secondary: #6239AB;
+    --secondary-light: #7a4fd1;
+    --secondary-dark: #4d2d87;
+    --error: #eb5160;
+    --warning: #d4a10d;
     --background: #ffffff;
     --surface: #f8fafc;
     --text: #1e293b;
@@ -19,7 +20,7 @@
     --radius-lg: 12px;
     --radius-xl: 16px;
     --transition: all 0.2s ease;
-  }
+}
   
   /* Main Container */
   .chat-container {
@@ -63,7 +64,7 @@
   /* Header */
   .chat-header {
     background-color: var(--primary);
-    color: white;
+    border-bottom: 1px solid var(--primary-dark);
     padding: 14px 18px;
     display: flex;
     justify-content: space-between;
@@ -72,6 +73,7 @@
   }
   
   .header-title {
+    color: white;
     font-weight: 600;
     font-size: 1.1rem;
     white-space: nowrap;
@@ -129,11 +131,11 @@
   }
   
   .warning-button {
-    color: #ff5252;
+    color: var(--error);
   }
   
   .warning-button:hover {
-    background-color: rgba(255, 82, 82, 0.15);
+    background-color: rgba(235, 81, 96, 0.15);
   }
   
   /* Tooltips */
@@ -175,11 +177,12 @@
   .load-warning {
     background-color: #fff3cd;
     color: #856404;
+    border-left: 4px solid var(--warning);
+
     padding: 12px;
     border-radius: var(--radius);
     margin-bottom: 12px;
     font-size: 0.9rem;
-    border-left: 4px solid #ffeeba;
   }
   
   /* Individual Messages */
@@ -200,7 +203,7 @@
   
   .message-line.user {
     align-self: flex-end;
-    background-color: var(--primary-light);
+    background-color: var(--primary);
     color: white;
     border-bottom-right-radius: 4px;
   }
@@ -225,11 +228,11 @@
   .function-call-message {
     background-color: #f0f9ff;
     color: #0369a1;
+    border-left: 3px solid var(--secondary);
     padding: 10px 14px;
     border-radius: var(--radius);
     align-self: center;
     font-size: 0.9rem;
-    border-left: 3px solid #0ea5e9;
     animation: pulse 1.5s infinite;
   }
   
@@ -242,7 +245,7 @@
   /* Thinking dots */
   .thinking-dots {
     align-self: center;
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(96, 116, 102, 0.1);
     color: var(--text-light);
     padding: 8px 16px;
     border-radius: 20px;
@@ -254,11 +257,11 @@
   .help-message {
     background-color: #e0f2fe;
     color: #0369a1;
+    border-left: 3px solid var(--secondary-light);
     padding: 12px;
     border-radius: var(--radius);
     font-size: 0.9rem;
     margin-top: 10px;
-    border-left: 3px solid #38bdf8;
   }
   
   /* Input Area */
@@ -316,11 +319,11 @@
   }
   
   .input-buttons .warning-button {
-    background-color: var(--danger);
+    background-color: var(--error);
   }
   
   .input-buttons .warning-button:hover {
-    background-color: #dc2626;
+    background-color: #d93b4b;
   }
   
  /* History Panel */
@@ -359,9 +362,9 @@
   .spinner {
     width: 30px;
     height: 30px;
-    border: 3px solid rgba(59, 130, 246, 0.2);
-    border-radius: 50%;
+    border: 3px solid rgba(96, 116, 102, 0.2);
     border-top-color: var(--primary);
+    border-radius: 50%;
     animation: spin 1s linear infinite;
   }
   
@@ -463,21 +466,24 @@
   }
 
   .message-bubble {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     border-radius: 0.75rem;
     padding: 0.75rem;
     max-width: 80%;
+    word-break: break-word;
 }
 
 .message-bubble.user {
-    background-color: #e3f2fd;
+    background-color: var(--primary-light);
+    color: white;
     align-self: flex-end;
     margin-left: 20%;
     border-bottom-right-radius: 0.25rem;
 }
 
 .message-bubble.assistant {
-    background-color: #f5f5f5;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     align-self: flex-start;
     margin-right: 20%;
     border-bottom-left-radius: 0.25rem;
@@ -486,7 +492,7 @@
 .message-bubble.function-call,
 .message-bubble.function-response {
     background-color: #fff8e1;
-    border-left: 3px solid #ffb74d;
+    border-left: 3px solid var(--warning);
     font-family: monospace;
     width: 90%;
     margin: 0.5rem auto;
@@ -495,10 +501,14 @@
 .message-header {
     font-weight: bold;
     font-size: 0.8rem;
-    margin-bottom: 0.5rem;
-    color: #555;
+    margin-bottom: 0.25rem;
+    color: rgba(0, 0, 0, 0.6);
 }
 
 .message-content {
     line-height: 1.5;
+}
+
+.message-content p {
+    margin: 0.25rem 0;
 }
