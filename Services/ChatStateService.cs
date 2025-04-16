@@ -16,7 +16,7 @@ namespace NetworkMonitorBlazor.Services
         public bool AutoScrollEnabled { get; set; } = true;
 
         // Processing and loading states
-        public bool IsReady { get; set; } = true;
+        public bool IsReady { get; set; } = false;
         public int LoadCount { get; set; } = 0;
         public string LoadWarning { get; set; } = "";
         public bool IsProcessing { get; set; } = false;
@@ -30,39 +30,42 @@ namespace NetworkMonitorBlazor.Services
         public bool ShowHelpMessage { get; set; } = false;
         public string HelpMessage { get; set; } = "";
         public string CurrentMessage { get; set; } = "";
-               public bool IsDashboard { get; set; }
-        public ChatMessage Message { get; set; } = new ChatMessage 
-        { 
-            Info = "init", 
-            Success = false, 
-            Text = "Internal Error" 
+        public bool IsDashboard { get; set; }
+        public ChatMessage Message { get; set; } = new ChatMessage
+        {
+            Info = "init",
+            Success = false,
+            Text = "Internal Error"
         };
 
-        // In ChatStateService.cs
-public string LLMFeedback 
-{
-    get => _llmFeedback;
-    set
-    {
-        _llmFeedback = value;
-        NotifyStateChanged();
-    }
-}
-private string _llmFeedback = string.Empty;
+        public event Action? OnChange = null; // Mark as nullable
 
-public List<ChatHistory> Histories
-{
-    get => _histories;
-    set
-    {
-        _histories = value;
-        NotifyStateChanged();
-    }
-}
-private List<ChatHistory> _histories = new();
+
+        // In ChatStateService.cs
+        public string LLMFeedback
+        {
+            get => _llmFeedback;
+            set
+            {
+                _llmFeedback = value;
+                NotifyStateChanged();
+            }
+        }
+        private string _llmFeedback = string.Empty;
+
+        public List<ChatHistory> Histories
+        {
+            get => _histories;
+            set
+            {
+                _histories = value;
+                NotifyStateChanged();
+            }
+        }
+        private List<ChatHistory> _histories = new();
 
         // Data states
-               public List<HostLink> LinkData { get; set; } = new List<HostLink>();
+        public List<HostLink> LinkData { get; set; } = new List<HostLink>();
         public string LLMRunnerType { get; set; } = "TurboLLM";
         public bool IsHoveringMessages { get; set; } = false;
         public bool IsInputFocused { get; set; } = false;
@@ -81,45 +84,45 @@ private List<ChatHistory> _histories = new();
         }
 
 
-public async Task Initialize(string initRunnerType)
-{
-    LLMRunnerType = initRunnerType;
-    LLMRunnerTypeRef = initRunnerType;
-    SessionId = await CreateNewSession();
-    OnChange?.Invoke();
-}
-  public async Task ClearSession()
-    {
-        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
-        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
-        SessionId = string.Empty;
-        OnChange?.Invoke();
-    }
-private async Task<string> CreateNewSession()
-{
-    var newSessionId = Guid.NewGuid().ToString();
-    await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
-    await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
-    return newSessionId;
-}
+        public async Task Initialize(string initRunnerType)
+        {
+            LLMRunnerType = initRunnerType;
+            LLMRunnerTypeRef = initRunnerType;
+            SessionId = await CreateNewSession();
+            NotifyStateChanged();
+        }
+        public async Task ClearSession()
+        {
+            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
+            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
+            SessionId = string.Empty;
+            NotifyStateChanged();
+        }
+        private async Task<string> CreateNewSession()
+        {
+            var newSessionId = Guid.NewGuid().ToString();
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
+            return newSessionId;
+        }
 
         private async Task<string> GetSessionId()
         {
             // Check if we have a recent session in localStorage
             var storedSessionId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "sessionId");
             var storedTimestamp = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "sessionTimestamp");
-            
+
             if (!string.IsNullOrEmpty(storedSessionId) && !string.IsNullOrEmpty(storedTimestamp))
             {
                 var currentTime = DateTime.Now.Ticks;
                 var storedTime = long.Parse(storedTimestamp);
                 var oneDayInTicks = TimeSpan.TicksPerDay;
-                
+
                 if (currentTime - storedTime <= oneDayInTicks)
                 {
                     return storedSessionId;
                 }
-                
+
                 await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
                 await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
             }
@@ -130,9 +133,6 @@ private async Task<string> CreateNewSession()
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
             return newSessionId;
         }
-
-       public event Action? OnChange = null; // Mark as nullable
-
 
         public void NotifyStateChanged() => OnChange?.Invoke();
     }

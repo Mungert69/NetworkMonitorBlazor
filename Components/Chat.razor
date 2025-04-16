@@ -1,20 +1,219 @@
+@page "/chat"
 @using NetworkMonitorBlazor.Services
 @using NetworkMonitorBlazor.Models
+@using System.Text
 @inject ChatStateService ChatState
+@inject IJSRuntime JSRuntime
 @inject WebSocketService WebSocketService
 @inject AudioService AudioService
-@inject IJSRuntime JSRuntime
+@inject LLMService LLMService
 
-<ChatContent @ref="chatContentRef"
-             OnHostLinkClick="OnHostLinkClick"
-             IsDashboard="@IsDashboard"
-             InitRunnerType="@InitRunnerType"
-             SetIsChatOpen="@SetIsChatOpen"
-             SiteId="@SiteId" />
+<div class="chat-container @(ChatState.IsExpanded ? "expanded" : "")" style="@GetChatContainerStyle()">
+    <div class="chat-card">
+        @* Warning Message *@
+        @if (!string.IsNullOrEmpty(ChatState.LoadWarning))
+        {
+            <div class="load-warning">
+                @((MarkupString)ChatState.LoadWarning)
+            </div>
+        }
+
+        @* Header Section *@
+        <div class="chat-header">
+            <div class="header-actions">
+                <div class="header-title">
+                    Network Monitor Assistant (@ChatState.LLMRunnerType)
+                </div>
+                
+                @* Left-Aligned Actions *@
+                <div class="action-buttons-left">
+                    <button @onclick="SaveFeedback" disabled="@(!ChatState.IsReady)" aria-label="Save chat">
+                        <i class="material-icons">save</i>
+                        <span class="tooltip">Save</span>
+                    </button>
+                    
+                    <button @onclick="ToggleLLMRunnerType" disabled="@ChatState.IsToggleDisabled" aria-label="Toggle LLM type">
+                       <i class="material-icons">swap_horiz</i>
+                        <span class="tooltip">Toggle LLM Type</span>
+                    </button>
+                    
+                    @if (!ChatState.IsDrawerOpen)
+                    {
+                        <button @onclick="() => ToggleDrawer(true)" disabled="@(!ChatState.IsReady)" aria-label="Open links">
+                            <i class="material-icons">keyboard_arrow_up</i>
+                            <span class="tooltip">Open Links</span>
+                        </button>
+                    }
+                    
+                    <button @onclick="ToggleExpand" aria-label="@(ChatState.IsExpanded ? "Contract" : "Expand")">
+                        @if (ChatState.IsExpanded)
+                        {
+                            <i class="material-icons">fullscreen_exit</i>
+                            <span class="tooltip">Contract</span>
+                        }
+                        else
+                        {
+                           	<i class="material-icons">fullscreen</i>
+                            <span class="tooltip">Expand</span>
+                        }
+                    </button>
+                    
+                    <button @onclick="ResetChat" class="warning-button" aria-label="Start new chat">
+                        <i class="material-icons">refresh</i>
+                        <span class="tooltip">Start New Chat</span>
+                    </button>
+                    
+                    <button @onclick="ToggleAudio" aria-label="@(ChatState.IsMuted ? "Unmute audio" : "Mute audio")">
+                        @if (ChatState.IsMuted)
+                        {
+                            <i class="material-icons">volume_off</i>
+                            <span class="tooltip">Unmute Audio</span>
+                        }
+                        else
+                        {
+                            <i class="material-icons">volume_up</i>
+                            <span class="tooltip">Mute Audio</span>
+                        }
+                    </button>
+                </div>
+                
+                @* Right-Aligned Actions *@
+                <div class="action-buttons-right">
+                    <button @onclick="ToggleHistory" @ref="historyButtonRef" aria-label="Chat history">
+                       	<i class="material-icons">history</i>
+                        <span class="tooltip">History</span>
+                    </button>
+                    
+                    <button @onclick="CloseChat" aria-label="Hide assistant">
+                       <i class="material-icons">close</i>
+                        <span class="tooltip">Hide Assistant</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        @* Chat Content *@
+        <div class="chat-messages" 
+             @ref="outputContainerRef"
+             @onmouseenter="() => ChatState.IsHoveringMessages = true"
+             @onmouseleave="() => ChatState.IsHoveringMessages = false"
+             aria-live="polite">
+            
+            @if (!ChatState.IsReady)
+            {
+                <div class="loading-indicator">
+                    <div class="spinner" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @((MarkupString)RenderMessages(ChatState.LLMFeedback))
+            }
+            
+            @if (ChatState.IsProcessing && !ChatState.IsLLMBusy)
+            {
+                <div class="thinking-dots" role="status">Thinking@(ChatState.ThinkingDots)</div>
+            }
+            
+            @if (ChatState.IsCallingFunction)
+            {
+                <div class="function-call-message" role="status">@ChatState.CallingFunctionMessage</div>
+            }
+            
+            @if (ChatState.ShowHelpMessage && !IsDashboard)
+            {
+                <div class="help-message">@ChatState.HelpMessage</div>
+            }
+        </div>
+
+        @* Links Drawer *@
+        <div class="drawer @(ChatState.IsDrawerOpen ? "open" : "")">
+            <div class="drawer-header">
+                <h3>Available Links</h3>
+                <button @onclick="() => ToggleDrawer(false)" class="close-drawer" aria-label="Close drawer">
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </button>
+            </div>
+            <div class="drawer-content">
+                @RenderLinks()
+            </div>
+        </div>
+
+       @* History Popper - Already implemented as a popup *@
+@if (IsHistoryOpen)
+{
+    <div class="history-popper @(IsHistoryOpen ? "visible" : "")" role="dialog" aria-label="Chat history">
+        <HistoryList 
+            Histories="ChatState.Histories" 
+            OnSelectSession="HandleSelectSession" 
+            OnDeleteSession="HandleDeleteSession" 
+            LLMType="ChatState.LLMRunnerType" 
+            CurrentSessionId="ChatState.SessionId" />
+    </div>
+}
+
+        @* Chat Input *@
+        <div class="chat-input">
+            <div class="input-container">
+                <textarea 
+                    @bind="ChatState.CurrentMessage"
+                    @bind:event="oninput"
+                    @onfocus="() => ChatState.IsInputFocused = true"
+                    @onblur="() => ChatState.IsInputFocused = false"
+                    placeholder="Type a message..."
+                    maxlength="10000"
+                    @onkeydown="HandleKeyDown"
+                    aria-label="Message input"
+                    rows="1"></textarea>
+                
+                <div class="input-buttons">
+                    <button 
+                        @onclick="SendMessage" 
+                        disabled="@(ChatState.IsLLMBusy || !ChatState.IsReady)"
+                        aria-label="Send message">
+                        	<i class="material-icons">send</i>
+                        <span class="tooltip">Send</span>
+                    </button>
+                    
+                    <button 
+                        @onclick="ToggleRecording" 
+                        disabled="@ChatState.IsProcessing"
+                        aria-label="@(IsRecording ? "Stop recording" : "Start recording")">
+                        @if (IsRecording)
+                        {
+                          <i class="material-icons">mic_off</i>
+                            <span class="tooltip">Stop Recording</span>
+                        }
+                        else
+                        {
+                           <i class="material-icons">mic</i>
+                            <span class="tooltip">Start Recording</span>
+                        }
+                    </button>
+                    
+                    <button 
+                        @onclick="StopLLM" 
+                        disabled="@(!ChatState.IsLLMBusy || !ChatState.IsReady)" 
+                        class="warning-button"
+                        aria-label="Stop assistant">
+                      <i class="material-icons">stop</i>
+                        <span class="tooltip">Stop</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<MessageDisplay Message="ChatState.Message" />
 
 @code {
-    private ChatContent? chatContentRef;
-    private bool _isInitialized = false;
+    private ElementReference outputContainerRef;
+    private ElementReference historyButtonRef;
+    private bool IsHistoryOpen = false;
+    private bool IsRecording = false;
 
     [Parameter]
     public EventCallback<HostLink> OnHostLinkClick { get; set; }
@@ -29,112 +228,398 @@
     public EventCallback<bool> SetIsChatOpen { get; set; }
 
     [Parameter]
-    public string SiteId { get; set; }
+    public string SiteId { get; set; } = "";
 
-  protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        ChatState.OnChange += StateHasChanged;
-    }
-
-    public void Dispose()
-    {
-        ChatState.OnChange -= StateHasChanged;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        try 
+        if (firstRender)
         {
-            // Initialize chat state first to get session ID
-            await ChatState.Initialize(InitRunnerType);
-            
-            // Initialize WebSocket with the obtained session ID
-            await WebSocketService.Initialize(SiteId, ChatState.SessionId);
-            
-            // Verify connection
-            await VerifyConnection();
-            
-            _isInitialized = true;
+            await InitializeChat();
         }
-        catch (Exception ex)
+
+        await ScrollToBottomIfNeeded();
+    }
+
+    private async Task InitializeChat()
+    {
+        await ChatState.Initialize(InitRunnerType);
+        await WebSocketService.Initialize(SiteId, ChatState.SessionId);
+    }
+
+    private async Task ScrollToBottomIfNeeded()
+    {
+        if (ChatState.AutoScrollEnabled)
         {
-            Console.Error.WriteLine($"Initialization failed: {ex}");
-            await RecoverFromError();
+            await JSRuntime.InvokeVoidAsync("chatInterop.scrollToBottom", outputContainerRef);
         }
     }
 
-    private async Task VerifyConnection()
+    private string GetChatContainerStyle()
     {
-        // Send verification message
-        await WebSocketService.SendMessage($"<|VERIFY_SESSION|{ChatState.SessionId}|>");
+        if (ChatState.IsExpanded)
+        {
+            return "position: fixed; top: 70px; left: 64px; right: 20px; bottom: 20px; width: calc(100% - 84px); height: calc(100% - 90px); max-height: none;";
+        }
         
-        // Add timeout check
-        await Task.Delay(2000); // Wait 2 seconds for response
+        return "position: fixed; bottom: 20px; right: 20px; width: 380px; height: calc(100% - 90px); max-height: 80vh;";
     }
 
-    private async Task RecoverFromError()
+    private async Task ResetChat()
     {
-        // Clear any existing session
+        await WebSocketService.SendMessage("<|REMOVE_SESSION|>");
+        await ClearLocalStorage();
+        
+        var newSessionId = Guid.NewGuid().ToString();
+        await StoreSessionId(newSessionId);
+        ChatState.SessionId = newSessionId;
+    }
+
+    private async Task ClearLocalStorage()
+    {
         await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
         await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
-        
-        // Retry initialization
-        await OnInitializedAsync();
     }
 
-protected override async Task OnAfterRenderAsync(bool firstRender)
-{
-    if (firstRender)
+    private async Task StoreSessionId(string sessionId)
     {
-        // Initialize ChatState FIRST
-        await ChatState.Initialize(InitRunnerType);
-        
-        // THEN initialize WebSocket with BOTH parameters
-        await WebSocketService.Initialize(SiteId, ChatState.SessionId);  // Add sessionId
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", sessionId);
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
     }
 
-    // Keep your existing auto-scroll logic
-    if (ChatState.AutoScrollEnabled)
+    private async Task ProcessAudioBlob(byte[] audioBlob)
     {
-        //await JSRuntime.InvokeVoidAsync("scrollToBottom", outputContainerRef);
-    }
-}
-    private async Task LoadInitialState()
-    {
-        try 
+        try
         {
-            // Request session history if needed
-            await WebSocketService.SendMessage($"<|REQUEST_HISTORY|{ChatState.SessionId}|>");
+            ChatState.IsProcessing = true;
+            StateHasChanged();
+
+            var transcription = await AudioService.TranscribeAudio(audioBlob);
+
+            if (!string.IsNullOrEmpty(transcription))
+            {
+                await SendTranscription(transcription);
+            }
+            else
+            {
+                await ShowAlert("Failed to transcribe audio.");
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to load initial state: {ex}");
+            Console.Error.WriteLine($"Error processing audio: {ex}");
+            await ShowAlert("Error processing audio.");
+        }
+        finally
+        {
+            ChatState.IsProcessing = false;
+            StateHasChanged();
         }
     }
 
-    private async Task ResetSessionId()
+    private async Task ShowAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    private async Task SendTranscription(string transcription)
+    {
+        await AudioService.ClearQueue();
+        ChatState.IsProcessing = true;
+        await WebSocketService.SendMessage(transcription);
+        ChatState.CurrentMessage = "";
+        StateHasChanged();
+    }
+
+    private async Task HandleStartRecording()
+    {
+        await AudioService.PauseAudio();
+        IsRecording = true;
+        await JSRuntime.InvokeVoidAsync("startRecording");
+    }
+
+    private async Task HandleStopRecording()
+    {
+        IsRecording = false;
+        var audioBlob = await JSRuntime.InvokeAsync<byte[]>("stopRecording");
+        await ProcessAudioBlob(audioBlob);
+    }
+
+    private void ToggleRecording()
+    {
+        if (IsRecording)
+        {
+            _ = HandleStopRecording();
+        }
+        else
+        {
+            _ = HandleStartRecording();
+        }
+    }
+
+    private void ToggleExpand()
+    {
+        ChatState.IsExpanded = !ChatState.IsExpanded;
+    }
+
+    private void ToggleDrawer(bool open)
+    {
+        ChatState.IsDrawerOpen = open;
+    }
+
+    private async Task ToggleAudio()
+    {
+        if (ChatState.IsMuted)
+        {
+            ChatState.IsMuted = false;
+            await WebSocketService.SendMessage("<|START_AUDIO|>");
+        }
+        else
+        {
+            await AudioService.ClearQueue();
+            ChatState.IsMuted = true;
+            await WebSocketService.SendMessage("<|STOP_AUDIO|>");
+        }
+    }
+
+    private async Task HandleSelectSession(string selectedSessionId)
+    {
+        ChatState.SessionId = selectedSessionId;
+        ChatState.OpenMessage = "<|REPLAY_HISTORY|>";
+        await ReloadHistory();
+    }
+
+    private async Task HandleDeleteSession(string fullSessionId)
+    {
+        await WebSocketService.SendMessage("<|REMOVE_SAVED_SESSION|>" + fullSessionId);
+    }
+
+    private async Task ReloadHistory()
+    {
+        await WebSocketService.SendMessage(ChatState.OpenMessage);
+    }
+
+    private void ToggleLLMRunnerType()
+    {
+        if (ChatState.IsToggleDisabled) return;
+        
+        ChatState.OpenMessage = "<|REPLAY_HISTORY|>";
+        ChatState.IsToggleDisabled = true;
+
+        var types = LLMService.GetLLMTypes();
+        var currentIndex = types.IndexOf(ChatState.LLMRunnerTypeRef);
+        var nextIndex = (currentIndex + 1) % types.Count;
+        
+        ChatState.LLMRunnerTypeRef = types[nextIndex];
+        ChatState.LLMRunnerType = types[nextIndex];
+    }
+
+    private async Task SaveFeedback()
+    {
+        await JSRuntime.InvokeVoidAsync("downloadFile", "AssistantOutput.txt", ChatState.LLMFeedback);
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(ChatState.CurrentMessage)) return;
+        
+        await AudioService.ClearQueue();
+        ChatState.IsProcessing = true;
+        await WebSocketService.SendMessage(ChatState.CurrentMessage);
+        ChatState.CurrentMessage = "";
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendMessage();
+        }
+    }
+
+    private async Task StopLLM()
+    {
+        await WebSocketService.SendMessage("<|STOP_LLM|>");
+    }
+
+    private void ToggleHistory()
+    {
+        IsHistoryOpen = !IsHistoryOpen;
+    }
+
+    private void CloseChat()
+    {
+        SetIsChatOpen.InvokeAsync(false);
+        IsHistoryOpen = false;
+    }
+
+    private RenderFragment RenderLinks()
+    {
+        if (ChatState.LinkData == null || ChatState.LinkData.Count == 0)
+        {
+            return @<div class="no-links">No links available</div>;
+        }
+
+        return @<ul class="link-list">
+            @foreach (var linkItem in ChatState.LinkData)
+            {
+                <li>
+                    <button 
+                        @onclick="(() => HandleLinkClick(linkItem))" 
+                        class="link-button"
+                        title="@linkItem.Address">
+                        
+                        @if (!string.IsNullOrEmpty(linkItem.DateStarted))
+                        {
+                            <span class="link-address">@linkItem.Address</span>
+                            <span class="link-date">@linkItem.DateStarted</span>
+                        }
+                        else
+                        {
+                            @linkItem.Address
+                        }
+                    </button>
+                </li>
+            }
+        </ul>;
+    }
+
+    private void HandleLinkClick(HostLink linkItem)
+    {
+        if (ChatState.IsExpanded)
+        {
+            ChatState.IsExpanded = false;
+        }
+        
+        OnHostLinkClick.InvokeAsync(linkItem);
+    }
+
+  private string RenderMessages(string content)
 {
-    await WebSocketService.SendMessage("<|REMOVE_SESSION|>");
+    if (string.IsNullOrEmpty(content))
+    {
+        return "";
+    }
+
+    // Split content into distinct message blocks
+    var messageBlocks = ParseMessageBlocks(content);
     
-    // Clear existing session
-    await ChatState.ClearSession();  // Use ChatState's new method
-    
-    // Create new session
-    await ChatState.Initialize(InitRunnerType);
-    
-    // Reinitialize WebSocket
-    await WebSocketService.Initialize(SiteId, ChatState.SessionId);
+    // Format the message blocks with proper styling
+    return FormatMessageBlocks(messageBlocks);
 }
 
-private async Task ResetLLM()
+private List<(string Type, string Content)> ParseMessageBlocks(string content)
 {
-    await WebSocketService.SendMessage("<|REMOVE_SESSION|>");
+    var messageBlocks = new List<(string Type, string Content)>();
+    var markers = new[] { "<User:>", "<Assistant:>", "<Function Call:>", "<Function Response:>" };
+    var currentPos = 0;
     
-    // Clear and recreate session
-    await ChatState.ClearSession();
-    await ChatState.Initialize(InitRunnerType);
+    while (currentPos < content.Length)
+    {
+        // Find the next marker
+        var nextMarkerPos = content.Length;
+        string nextMarker = null;
+        
+        foreach (var marker in markers)
+        {
+            var pos = content.IndexOf(marker, currentPos);
+            if (pos >= 0 && pos < nextMarkerPos)
+            {
+                nextMarkerPos = pos;
+                nextMarker = marker;
+            }
+        }
+        
+        if (nextMarker == null)
+        {
+            // No more markers - add remaining as text
+            if (currentPos < content.Length)
+            {
+                messageBlocks.Add(("text", content.Substring(currentPos)));
+            }
+            break;
+        }
+        
+        // Add content before marker if it exists
+        if (nextMarkerPos > currentPos)
+        {
+            messageBlocks.Add(("text", content.Substring(currentPos, nextMarkerPos - currentPos)));
+        }
+        
+        // Find the end of this message (either next marker or end of content)
+        var messageStart = nextMarkerPos + nextMarker.Length;
+        var nextMarkerEnd = content.Length;
+        
+        foreach (var marker in markers)
+        {
+            var pos = content.IndexOf(marker, messageStart);
+            if (pos >= 0 && pos < nextMarkerEnd)
+            {
+                nextMarkerEnd = pos;
+            }
+        }
+        
+        var messageContent = content.Substring(messageStart, nextMarkerEnd - messageStart);
+        var messageType = nextMarker.Replace("<", "").Replace(">", "").Replace(":", "").Trim();
+        
+        messageBlocks.Add((messageType, messageContent));
+        currentPos = nextMarkerEnd;
+    }
     
-    // Reinitialize WebSocket
-    await WebSocketService.Initialize(SiteId, ChatState.SessionId);
+    return messageBlocks;
 }
+
+private string FormatMessageBlocks(List<(string Type, string Content)> messageBlocks)
+{
+    var result = new System.Text.StringBuilder();
+    var currentType = "";
+    var currentContent = new StringBuilder();
+    
+    foreach (var block in messageBlocks)
+    {
+        if (block.Type == "text")
+        {
+            // Accumulate text blocks with the current type
+            currentContent.Append(block.Content);
+        }
+        else
+        {
+            // If we have accumulated content, flush it first
+            if (currentContent.Length > 0 && !string.IsNullOrEmpty(currentType))
+            {
+                AppendMessage(result, currentType, currentContent.ToString());
+                currentContent.Clear();
+            }
+            
+            currentType = block.Type;
+            currentContent.Append(block.Content);
+        }
+    }
+    
+    // Flush any remaining content
+    if (currentContent.Length > 0 && !string.IsNullOrEmpty(currentType))
+    {
+        AppendMessage(result, currentType, currentContent.ToString());
+    }
+    
+    return result.ToString();
+}
+
+private void AppendMessage(StringBuilder result, string type, string content)
+{
+    var cssClass = type.ToLower().Replace(" ", "-");
+    var displayName = type switch
+    {
+        "User" => "User",
+        "Assistant" => "Assistant",
+        "Function Call" => "Function Call",
+        "Function Response" => "Function Response",
+        _ => type
+    };
+    
+    result.Append($"<div class='message-bubble {cssClass}'>");
+    result.Append($"<div class='message-header'>{displayName}</div>");
+    result.Append($"<div class='message-content'>{MarkdownRenderer.ToHtml(content.Trim())}</div>");
+    result.Append("</div>");
+}
+  
 }

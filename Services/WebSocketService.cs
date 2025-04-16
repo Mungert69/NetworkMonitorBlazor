@@ -18,55 +18,55 @@ namespace NetworkMonitorBlazor.Services
         private readonly IJSRuntime _jsRuntime;
         private readonly AudioService _audioService;
         private CancellationTokenSource _cancellationTokenSource;
-      private string _siteId; // Remove readonly since we need to assign it later
-    private readonly ILLMService _llmService;
-    private string _currentSessionId; // Add this field
+        private string _siteId; // Remove readonly since we need to assign it later
+        private readonly ILLMService _llmService;
+        private string _currentSessionId; // Add this field
 
-         public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
-    {
-        _chatState = chatState;
-        _jsRuntime = jsRuntime;
-        _audioService = audioService;
-        _cancellationTokenSource = new CancellationTokenSource();
-        _llmService = llmService;
-        _siteId = string.Empty;
-        _currentSessionId = string.Empty;
-    }
-
-    public async Task Initialize(string siteId, string sessionId)
-    {
-        _siteId = siteId;
-        _currentSessionId = sessionId;
-        
-        try
+        public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
         {
-            await ConnectWebSocket();
-            var timeZone = TimeZoneInfo.Local.Id;
-            var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{sessionId}";
-            await Send(sendStr);
-            Console.WriteLine($"WebSocket initialized for session: {sessionId}");
+            _chatState = chatState;
+            _jsRuntime = jsRuntime;
+            _audioService = audioService;
+            _cancellationTokenSource = new CancellationTokenSource();
+            _llmService = llmService;
+            _siteId = string.Empty;
+            _currentSessionId = string.Empty;
         }
-        catch (Exception ex)
+
+        public async Task Initialize(string siteId, string sessionId)
         {
-            Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
-            await Reconnect();
+            _siteId = siteId;
+            _currentSessionId = sessionId;
+
+            try
+            {
+                await ConnectWebSocket();
+                var timeZone = TimeZoneInfo.Local.Id;
+                var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{sessionId}";
+                await Send(sendStr);
+                Console.WriteLine($"WebSocket initialized for session: {sessionId}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
+                await Reconnect();
+            }
         }
-    }
 
 
-     
-public async Task<bool> VerifySession()
-{
-    try
-    {
-        await Send($"<|VERIFY_SESSION|{_currentSessionId}|>");
-        return true;
-    }
-    catch
-    {
-        return false;
-    }
-}
+
+        public async Task<bool> VerifySession()
+        {
+            try
+            {
+                await Send($"<|VERIFY_SESSION|{_currentSessionId}|>");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         private async Task ConnectWebSocket()
         {
             try
@@ -117,7 +117,7 @@ public async Task<bool> VerifySession()
 
         private async Task ReceiveMessages()
         {
-            var buffer = new byte[1024 * 4];
+            var buffer = new byte[65535];
             while (!_cancellationTokenSource.Token.IsCancellationRequested && _webSocket?.State == WebSocketState.Open)
             {
                 try
@@ -142,128 +142,102 @@ public async Task<bool> VerifySession()
             }
         }
 
-        private async Task ProcessMessage(string message)
+      private async Task ProcessMessage(string message)
+{
+    try
+    {
+        Console.WriteLine($"Received message: {message}");
+
+        // Handle control messages first
+        if (message.StartsWith("</llm-"))
         {
-            Console.WriteLine($"Received message: {message}");
-
-            // Handle audio data
-            if (message.Contains("</audio>"))
-            {
-                var parts = message.Split(new[] { "</audio>" }, StringSplitOptions.None);
-                var textPart = parts[0]?.Trim() ?? "";
-                var audioFile = parts.Length > 1 ? parts[1]?.Trim() : "";
-
-                if (!string.IsNullOrEmpty(textPart))
-                {
-                    _chatState.LLMFeedback += FilterLLMOutput(textPart);
-                }
-
-                if (!string.IsNullOrEmpty(audioFile))
-                {
-                    await _audioService.PlayAudioSequentially(audioFile);
-                }
-                return;
-            }
-
-            // Handle function data
-            if (message.StartsWith("<function-data>") && message.EndsWith("</function-data>"))
-            {
-                var functionData = message.Substring("<function-data>".Length, message.Length - "<function-data>".Length - "</function-data>".Length);
-                var generatedLinkData = ProcessFunctionData(functionData);
-
-                if (generatedLinkData != null)
-                {
-                    _chatState.LinkData = generatedLinkData;
-                    if (generatedLinkData.Count > 1)
-                    {
-                        _chatState.IsDrawerOpen = true;
-                    }
-                }
-                return;
-            }
-
-            // Handle history display data
-            if (message.StartsWith("<history-display-name>") && message.EndsWith("</history-display-name>"))
-            {
-                var historyData = message.Substring("<history-display-name>".Length, message.Length - "<history-display-name>".Length - "</history-display-name>".Length);
-                ProcessHistoryDisplayData(historyData);
-                return;
-            }
-
-            // Handle control messages
-            if (message.StartsWith("</llm-error>"))
-            {
-                _chatState.Message = new ChatMessage
-                {
-                    Persist = true,
-                    Text = message.Substring("</llm-error>".Length),
-                    Success = false
-                };
-                return;
-            }
-            else if (message.StartsWith("</llm-info>"))
-            {
-                _chatState.Message = new ChatMessage
-                {
-                    Info = "",
-                    Text = message.Substring("</llm-info>".Length)
-                };
-                return;
-            }
-            else if (message.StartsWith("</llm-warning>"))
-            {
-                _chatState.Message = new ChatMessage
-                {
-                    Warning = "",
-                    Text = message.Substring("</llm-warning>".Length)
-                };
-                return;
-            }
-            else if (message.StartsWith("</llm-success>"))
-            {
-                _chatState.Message = new ChatMessage
-                {
-                    Success = true,
-                    Text = message.Substring("</llm-success>".Length)
-                };
-                return;
-            }
-            else if (message == "</llm-ready>")
-            {
-                _chatState.IsReady = true;
-                return;
-            }
-            else if (message == "</functioncall>")
-            {
-                _chatState.IsCallingFunction = true;
-                return;
-            }
-            else if (message == "</functioncall-complete>")
-            {
-                _chatState.IsCallingFunction = false;
-                return;
-            }
-            else if (message == "</llm-busy>")
-            {
-                _chatState.IsLLMBusy = true;
-                return;
-            }
-            else if (message == "</llm-listening>")
-            {
-                _chatState.IsLLMBusy = false;
-                return;
-            }
-            else if (message == "<end-of-line>")
-            {
-                _chatState.IsProcessing = false;
-                return;
-            }
-
-            // Default case: append to feedback
-            _chatState.LLMFeedback += FilterLLMOutput(message);
-            _chatState.NotifyStateChanged();
+            ProcessControlMessage(message);
+            return;
+        }
+        else if (message == "<end-of-line>")
+        {
+            _chatState.IsProcessing = false;
+            return;
+        }
+        else if (message.StartsWith("<history-display-name>"))
+        {
+            ProcessHistoryDisplayData(message.Substring("<history-display-name>".Length, 
+                message.Length - "<history-display-name>".Length - "</history-display-name>".Length));
+            return;
         }
 
+        // Handle streaming text messages
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            // Accumulate the message chunks
+            _chatState.LLMFeedback += FilterLLMOutput(message);
+        
+            
+            _chatState.NotifyStateChanged();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error processing message: {ex}");
+    }
+}
+
+private void ProcessControlMessage(string message)
+{
+    if (message.StartsWith("</llm-error>"))
+    {
+        _chatState.Message = new ChatMessage
+        {
+            Persist = true,
+            Text = message.Substring("</llm-error>".Length),
+            Success = false
+        };
+    }
+    else if (message.StartsWith("</llm-info>"))
+    {
+        _chatState.Message = new ChatMessage
+        {
+            Info = "",
+            Text = message.Substring("</llm-info>".Length)
+        };
+    }
+    else if (message.StartsWith("</llm-warning>"))
+    {
+        _chatState.Message = new ChatMessage
+        {
+            Warning = "",
+            Text = message.Substring("</llm-warning>".Length)
+        };
+    }
+    else if (message.StartsWith("</llm-success>"))
+    {
+        _chatState.Message = new ChatMessage
+        {
+            Success = true,
+            Text = message.Substring("</llm-success>".Length)
+        };
+    }
+    else if (message == "</llm-ready>")
+    {
+        _chatState.IsReady = true;
+    }
+    else if (message == "</functioncall>")
+    {
+        _chatState.IsCallingFunction = true;
+    }
+    else if (message == "</functioncall-complete>")
+    {
+        _chatState.IsCallingFunction = false;
+    }
+    else if (message == "</llm-busy>")
+    {
+        _chatState.IsLLMBusy = true;
+    }
+    else if (message == "</llm-listening>")
+    {
+        _chatState.IsLLMBusy = false;
+    }
+}
         private string FilterLLMOutput(string text)
         {
             var replacements = new Dictionary<string, string>
@@ -356,8 +330,7 @@ public async Task<bool> VerifySession()
                 if (histories != null)
                 {
                     _chatState.Histories = histories;
-                    _chatState.NotifyStateChanged();
-                }
+                   }
                 else
                 {
                     Console.Error.WriteLine("Invalid history data format");

@@ -64,14 +64,7 @@ window.chatInterop = {
         element.click();
         document.body.removeChild(element);
     },
-
-    // Scroll functionality
-    scrollToBottom: (element) => {
-        if (element) {
-            element.scrollTo({
-                top: element.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
+    scrollToBottom: function(element) {
+        element.scrollTop = element.scrollHeight;
     }
 };
