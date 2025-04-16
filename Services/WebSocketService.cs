@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,7 +21,12 @@ namespace NetworkMonitorBlazor.Services
         private CancellationTokenSource _cancellationTokenSource;
         private string _siteId; // Remove readonly since we need to assign it later
         private readonly ILLMService _llmService;
-    
+
+        private int _reconnectAttempts = 0;
+        private const int MaxReconnectAttempts = 5;
+        private bool _isReconnecting = false;
+        private readonly object _reconnectLock = new object();
+
         public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
         {
             _chatState = chatState;
@@ -29,40 +35,39 @@ namespace NetworkMonitorBlazor.Services
             _cancellationTokenSource = new CancellationTokenSource();
             _llmService = llmService;
             _siteId = string.Empty;
-          }
+        }
 
         public async Task Initialize(string siteId)
-{
-    _siteId = siteId;
+        {
+            _siteId = siteId;
 
-    try
-    {
-        await ConnectWebSocket(); // This now JUST connects without sending init message
-        await SendInitialization(); // Send init message separately
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
-       // await Reconnect();
-    }
-}
-private async Task SendInitialization()
-{
-    try 
-    {
-        var timeZone = TimeZoneInfo.Local.Id;
-        var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{_chatState.SessionId}";
-        await Send(sendStr);
-        Console.WriteLine($"Sent initialization: {sendStr}");
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"Error sending initialization: {ex}");
-        throw;
-    }
-}
+            try
+            {
+                await ConnectWebSocket(); // This now JUST connects without sending init message
+                await SendInitialization(); // Send init message separately
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
+            }
+        }
+        private async Task SendInitialization()
+        {
+            try
+            {
+                var timeZone = TimeZoneInfo.Local.Id;
+                var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{_chatState.SessionId}";
+                await Send(sendStr);
+                Console.WriteLine($"Sent initialization: {sendStr}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error sending initialization: {ex}");
+                throw;
+            }
+        }
 
-      
+
 
 
         public async Task<bool> VerifySession()
@@ -77,26 +82,25 @@ private async Task SendInitialization()
                 return false;
             }
         }
-private async Task ConnectWebSocket()
-{
-    try
-    {
-       
+        private async Task ConnectWebSocket()
+        {
+            try
+            {
 
-        _webSocket = new ClientWebSocket();
-        var serverUrl = _llmService.GetLLMServerUrl(_siteId);
-        await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
-        
-        // Start listening and ping - but DON'T send init message here
-        _ = Task.Run(ReceiveMessages, _cancellationTokenSource.Token);
-        _ = Task.Run(PingInterval, _cancellationTokenSource.Token);
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"WebSocket connection error: {ex}");
-        await Reconnect();
-    }
-}
+
+                _webSocket = new ClientWebSocket();
+                var serverUrl = _llmService.GetLLMServerUrl(_siteId);
+                await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
+
+                // Start listening and ping - but DON'T send init message here
+                _ = Task.Run(ReceiveMessages, _cancellationTokenSource.Token);
+                _ = Task.Run(PingInterval, _cancellationTokenSource.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"WebSocket connection error: {ex}");
+            }
+        }
         private async Task PingInterval()
         {
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
@@ -108,15 +112,45 @@ private async Task ConnectWebSocket()
                         await Send("");
                         Console.WriteLine("Sent web socket Ping");
                     }
+                    else
+                    {
+                        await Reconnect();
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"Ping error: {ex}");
+                    await HandleSendFailure(ex);
                 }
-                await Task.Delay(5000, _cancellationTokenSource.Token);
+                await Task.Delay(20000);
             }
         }
 
+        // Add these helper methods
+        private async Task HandleSendFailure(Exception ex)
+        {
+            Console.Error.WriteLine($"Send failure: {ex.Message}");
+            if (IsConnectionLost(ex))
+            {
+                await Reconnect();
+            }
+        }
+
+        private async Task HandleReceiveFailure(Exception ex)
+        {
+            Console.Error.WriteLine($"Receive failure: {ex.Message}");
+            if (IsConnectionLost(ex))
+            {
+                await Reconnect();
+            }
+        }
+
+        private bool IsConnectionLost(Exception ex)
+        {
+            return ex is WebSocketException ||
+                   ex is InvalidOperationException ||
+                   _webSocket?.State == WebSocketState.Aborted;
+        }
         private async Task ReceiveMessages()
         {
             var buffer = new byte[65535];
@@ -125,124 +159,117 @@ private async Task ConnectWebSocket()
                 try
                 {
                     var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), _cancellationTokenSource.Token);
-                    if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-                        await Reconnect();
-                        return;
-                    }
-
                     var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
                     await ProcessMessage(message);
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"WebSocket receive error: {ex}");
-                    await Reconnect();
                     return;
                 }
             }
         }
 
-      private async Task ProcessMessage(string message)
-{
-    try
-    {
-        Console.WriteLine($"Received message: {message}");
+        private async Task ProcessMessage(string message)
+        {
+            try
+            {
+                Console.WriteLine($"Received message: {message}");
 
-        // Handle control messages first
-        if (message.StartsWith("</llm-"))
-        {
-            ProcessControlMessage(message);
-            return;
-        }
-        else if (message == "<end-of-line>")
-        {
-            _chatState.IsProcessing = false;
-            return;
-        }
-        else if (message.StartsWith("<history-display-name>"))
-        {
-            ProcessHistoryDisplayData(message.Substring("<history-display-name>".Length, 
-                message.Length - "<history-display-name>".Length - "</history-display-name>".Length));
-            return;
+                // Handle control messages first
+                if (message.StartsWith("</llm-"))
+                {
+                    ProcessControlMessage(message);
+                    return;
+                }
+                else if (message == "<end-of-line>")
+                {
+                    _chatState.IsProcessing = false;
+                    return;
+                }
+                else if (message.StartsWith("<history-display-name>"))
+                {
+                    ProcessHistoryDisplayData(message.Substring("<history-display-name>".Length,
+                        message.Length - "<history-display-name>".Length - "</history-display-name>".Length));
+                    return;
+                }
+
+                // Handle streaming text messages
+                if (!string.IsNullOrWhiteSpace(message))
+                {
+                    // Accumulate the message chunks
+                    _chatState.LLMFeedback += FilterLLMOutput(message);
+
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing message: {ex}");
+            }
+            finally
+            {
+                _chatState.NotifyStateChanged();
+            }
         }
 
-        // Handle streaming text messages
-        if (!string.IsNullOrWhiteSpace(message))
+        private void ProcessControlMessage(string message)
         {
-            // Accumulate the message chunks
-            _chatState.LLMFeedback += FilterLLMOutput(message);
-        
-            
-
+            if (message.StartsWith("</llm-error>"))
+            {
+                _chatState.Message = new SystemMessage
+                {
+                    Persist = true,
+                    Text = message.Substring("</llm-error>".Length),
+                    Success = false
+                };
+            }
+            else if (message.StartsWith("</llm-info>"))
+            {
+                _chatState.Message = new SystemMessage
+                {
+                    Info = "",
+                    Text = message.Substring("</llm-info>".Length)
+                };
+            }
+            else if (message.StartsWith("</llm-warning>"))
+            {
+                _chatState.Message = new SystemMessage
+                {
+                    Warning = "",
+                    Text = message.Substring("</llm-warning>".Length)
+                };
+            }
+            else if (message.StartsWith("</llm-success>"))
+            {
+                _chatState.Message = new SystemMessage
+                {
+                    Success = true,
+                    Text = message.Substring("</llm-success>".Length)
+                };
+            }
+            else if (message == "</llm-ready>")
+            {
+                _chatState.IsReady = true;
+            }
+            else if (message == "</functioncall>")
+            {
+                _chatState.IsCallingFunction = true;
+            }
+            else if (message == "</functioncall-complete>")
+            {
+                _chatState.IsCallingFunction = false;
+            }
+            else if (message == "</llm-busy>")
+            {
+                _chatState.IsLLMBusy = true;
+            }
+            else if (message == "</llm-listening>")
+            {
+                _chatState.IsLLMBusy = false;
+            }
         }
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"Error processing message: {ex}");
-    }
-    finally{
-            _chatState.NotifyStateChanged();
-    }
-}
-
-private void ProcessControlMessage(string message)
-{
-    if (message.StartsWith("</llm-error>"))
-    {
-        _chatState.Message = new SystemMessage
-        {
-            Persist = true,
-            Text = message.Substring("</llm-error>".Length),
-            Success = false
-        };
-    }
-    else if (message.StartsWith("</llm-info>"))
-    {
-        _chatState.Message = new SystemMessage
-        {
-            Info = "",
-            Text = message.Substring("</llm-info>".Length)
-        };
-    }
-    else if (message.StartsWith("</llm-warning>"))
-    {
-        _chatState.Message = new SystemMessage
-        {
-            Warning = "",
-            Text = message.Substring("</llm-warning>".Length)
-        };
-    }
-    else if (message.StartsWith("</llm-success>"))
-    {
-        _chatState.Message = new SystemMessage
-        {
-            Success = true,
-            Text = message.Substring("</llm-success>".Length)
-        };
-    }
-    else if (message == "</llm-ready>")
-    {
-        _chatState.IsReady = true;
-    }
-    else if (message == "</functioncall>")
-    {
-        _chatState.IsCallingFunction = true;
-    }
-    else if (message == "</functioncall-complete>")
-    {
-        _chatState.IsCallingFunction = false;
-    }
-    else if (message == "</llm-busy>")
-    {
-        _chatState.IsLLMBusy = true;
-    }
-    else if (message == "</llm-listening>")
-    {
-        _chatState.IsLLMBusy = false;
-    }
-}
         private string FilterLLMOutput(string text)
         {
             var replacements = new Dictionary<string, string>
@@ -331,11 +358,18 @@ private void ProcessControlMessage(string message)
         {
             try
             {
-                var histories = System.Text.Json.JsonSerializer.Deserialize<List<ChatHistory>>(historyDisplayData);
+
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true // Handles any remaining case mismatches
+                };
+
+                var histories = JsonSerializer.Deserialize<List<ChatHistory>>(historyDisplayData, options);
                 if (histories != null)
                 {
                     _chatState.Histories = histories;
-                   }
+                }
                 else
                 {
                     Console.Error.WriteLine("Invalid history data format");
@@ -357,7 +391,6 @@ private void ProcessControlMessage(string message)
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error sending message: {ex}");
-                await Reconnect();
             }
         }
 
@@ -368,118 +401,192 @@ private void ProcessControlMessage(string message)
         }
 
         public async Task ResetLLM(bool createNewSession = true)
-{
-    try
-    {
-
-        // Reset chat state
-        _chatState.IsReady = false;
-        _chatState.IsMuted = true;
-        _chatState.LLMFeedback = "";
-        _chatState.IsProcessing = false;
-        _chatState.IsLLMBusy = false;
-        _chatState.IsCallingFunction = false;
-        _chatState.ThinkingDots = "";
-        _chatState.CallingFunctionMessage = "Processing function...";
-        _chatState.ShowHelpMessage = false;
-        _chatState.HelpMessage = "";
-        _chatState.CurrentMessage = "";
-
-        // Create new session if requested
-        if (createNewSession)
         {
-            await _chatState.ClearSession();
+            try
+            {
+
+                // Reset chat state
+                _chatState.IsReady = false;
+                _chatState.IsMuted = true;
+                _chatState.LLMFeedback = "";
+                _chatState.IsProcessing = false;
+                _chatState.IsLLMBusy = false;
+                _chatState.IsCallingFunction = false;
+                _chatState.ThinkingDots = "";
+                _chatState.CallingFunctionMessage = "Processing function...";
+                _chatState.ShowHelpMessage = false;
+                _chatState.HelpMessage = "";
+                _chatState.CurrentMessage = "";
+
+                // Create new session if requested
+                if (createNewSession)
+                {
+                    await _chatState.ClearSession();
+                }
+
+                // Reinitialize connection
+                await ConnectWebSocket();
+                await SendInitialization();
+
+                _chatState.NotifyStateChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"LLM reset error: {ex}");
+            }
         }
 
-        // Reinitialize connection
-        await ConnectWebSocket();
-        await SendInitialization();
-
-        _chatState.NotifyStateChanged();
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"LLM reset error: {ex}");
-        await Reconnect();
-    }
-}
-
-// Modified Dispose
-public void Dispose()
-{
-    try
-    {
-        _cancellationTokenSource.Cancel();
-        
-        if (_webSocket?.State == WebSocketState.Open)
+        // Modified Dispose
+        public void Dispose()
         {
-            _webSocket.CloseAsync(
-                WebSocketCloseStatus.NormalClosure,
-                "Disposing",
-                CancellationToken.None).Wait(3000);
+            try
+            {
+                _cancellationTokenSource.Cancel();
+
+                if (_webSocket?.State == WebSocketState.Open)
+                {
+                    _webSocket.CloseAsync(
+                        WebSocketCloseStatus.NormalClosure,
+                        "Disposing",
+                        CancellationToken.None).Wait(3000);
+                }
+            }
+            finally
+            {
+                _webSocket?.Dispose();
+                _cancellationTokenSource.Dispose();
+            }
         }
-    }
-    finally
-    {
-        _webSocket?.Dispose();
-        _cancellationTokenSource.Dispose();
-    }
-}
 
 
 
-public async Task CloseConnection()
-{
-    try
-    {
-        if (_webSocket?.State == WebSocketState.Open)
+        public async Task CloseConnection()
         {
-            await _webSocket.CloseAsync(
-                WebSocketCloseStatus.NormalClosure,
-                "Closing connection",
-                _cancellationTokenSource.Token);
+            try
+            {
+                if (_webSocket?.State == WebSocketState.Open)
+                {
+                    await _webSocket.CloseAsync(
+                        WebSocketCloseStatus.NormalClosure,
+                        "Closing connection",
+                        _cancellationTokenSource.Token);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error closing WebSocket: {ex}");
+            }
+            finally
+            {
+                _webSocket?.Dispose();
+                _webSocket = null;
+            }
         }
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"Error closing WebSocket: {ex}");
-    }
-    finally
-    {
-        _webSocket?.Dispose();
-        _webSocket = null;
-    }
-}
 
-      
+
 
         private async Task WaitForWebSocket()
         {
             while (_webSocket?.State != WebSocketState.Open && !_cancellationTokenSource.Token.IsCancellationRequested)
             {
-                await Task.Delay(100, _cancellationTokenSource.Token);
+                await Task.Delay(1000, _cancellationTokenSource.Token);
+                Console.Error.WriteLine($"Waiting for WebSocket");
             }
         }
 
-        
+
 
         private async Task Send(string message)
         {
-            if (_webSocket?.State != WebSocketState.Open)
-                throw new InvalidOperationException("WebSocket is not open");
+            try
+            {
+                if (_webSocket?.State != WebSocketState.Open)
+                {
+                    await Reconnect();
+                }
 
-            var buffer = Encoding.UTF8.GetBytes(message);
-            await _webSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, _cancellationTokenSource.Token);
+                var buffer = Encoding.UTF8.GetBytes(message);
+                await _webSocket.SendAsync(
+                    new ArraySegment<byte>(buffer),
+                    WebSocketMessageType.Text,
+                    true,
+                    _cancellationTokenSource.Token);
+
+                // Reset reconnect attempts on successful send
+                _reconnectAttempts = 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error sending message: {ex}");
+                await HandleSendFailure(ex);
+                throw; // Re-throw to let caller know send failed
+            }
         }
 
+        // Enhanced Reconnect method
         private async Task Reconnect()
         {
-            // Wait before reconnecting
-            await Task.Delay(5000, _cancellationTokenSource.Token);
-            await Initialize(_siteId);
+            // Prevent multiple simultaneous reconnection attempts
+            lock (_reconnectLock)
+            {
+                if (_isReconnecting) return;
+                _isReconnecting = true;
+            }
+
+            try
+            {
+                _reconnectAttempts++;
+                if (_reconnectAttempts > MaxReconnectAttempts)
+                {
+                    Console.Error.WriteLine("Max reconnect attempts reached");
+                    return;
+                }
+
+                // Calculate delay with exponential backoff (max 30 seconds)
+                var delay = Math.Min(30000, (int)Math.Pow(2, _reconnectAttempts) * 1000);
+                await Task.Delay(delay);
+
+                Console.WriteLine($"Attempting to reconnect (attempt {_reconnectAttempts})");
+
+                // Clean up old connection if it exists
+                if (_webSocket != null)
+                {
+                    try
+                    {
+                        await _webSocket.CloseAsync(
+                            WebSocketCloseStatus.NormalClosure,
+                            "Reconnecting",
+                            CancellationToken.None);
+                    }
+                    catch { /* Ignore close errors during reconnect */ }
+                    _webSocket.Dispose();
+                    _webSocket = null;
+                }
+
+                // Establish new connection
+                await ConnectWebSocket();
+                await SendInitialization();
+
+                Console.WriteLine("Reconnected successfully");
+                _reconnectAttempts = 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Reconnect attempt failed: {ex}");
+                if (_reconnectAttempts < MaxReconnectAttempts)
+                {
+                    await Reconnect(); // Try again
+                }
+            }
+            finally
+            {
+                lock (_reconnectLock)
+                {
+                    _isReconnecting = false;
+                }
+            }
         }
 
-      
 
         private class FunctionData
         {

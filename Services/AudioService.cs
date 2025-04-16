@@ -56,10 +56,15 @@ namespace NetworkMonitorBlazor.Services
 
         public async ValueTask DisposeAsync()
         {
-            if (_jsModule is not null)
+            try
             {
-                await _jsModule.DisposeAsync();
+                if (_jsModule is not null)
+                {
+                    await _jsModule.DisposeAsync();
+                }
             }
+            catch { }
+
         }
 
         // Note: Your current chatInterop.js doesn't have transcribeAudio implemented

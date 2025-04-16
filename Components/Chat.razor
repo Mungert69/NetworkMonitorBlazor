@@ -1,4 +1,4 @@
-@page "/chat"
+@page "/"
 @using NetworkMonitorBlazor.Services
 @using NetworkMonitorBlazor.Models
 @using System.Text
@@ -204,10 +204,11 @@
                 </div>
             </div>
         </div>
+        <MessageDisplay Message="ChatState.Message" />
     </div>
 </div>
 
-<MessageDisplay Message="ChatState.Message" />
+
 
 @code {
     private ElementReference outputContainerRef;
