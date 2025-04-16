@@ -56,7 +56,7 @@ namespace NetworkMonitorBlazor.Services
             set
             {
                 _llmFeedback = value;
-                NotifyStateChanged();
+                _ = NotifyStateChanged();
             }
         }
         private string _llmFeedback = string.Empty;
@@ -67,7 +67,7 @@ namespace NetworkMonitorBlazor.Services
             set
             {
                 _histories = value;
-                NotifyStateChanged();
+                _ = NotifyStateChanged();
             }
         }
         private List<ChatHistory> _histories = new();
@@ -107,7 +107,7 @@ namespace NetworkMonitorBlazor.Services
 
         public async Task StoreNewSessionID(string newSessionId)
         {
-            SessionId=newSessionId;
+            SessionId = newSessionId;
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
 
@@ -141,9 +141,22 @@ namespace NetworkMonitorBlazor.Services
             return newSessionId;
         }
 
-        public event Action? OnChange = null; // Mark as nullable
+        public event Func<Task>? OnChange = null; // Changed from Action to Func<Task>
 
 
-        public void NotifyStateChanged() => OnChange?.Invoke();
+        public async Task NotifyStateChanged()
+        {
+            if (OnChange != null)
+            {
+                try
+                {
+                    await OnChange.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in state notification: {ex}");
+                }
+            }
+        }
     }
 }

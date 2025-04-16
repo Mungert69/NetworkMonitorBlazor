@@ -210,7 +210,7 @@ namespace NetworkMonitorBlazor.Services
             }
             finally
             {
-                _chatState.NotifyStateChanged();
+               await  _chatState.NotifyStateChanged();
             }
         }
 
@@ -428,7 +428,7 @@ namespace NetworkMonitorBlazor.Services
                 await ConnectWebSocket();
                 await SendInitialization();
 
-                _chatState.NotifyStateChanged();
+                await _chatState.NotifyStateChanged();
             }
             catch (Exception ex)
             {

@@ -231,6 +231,23 @@
     [Parameter]
     public string SiteId { get; set; } = "";
 
+     
+    protected override async Task OnInitializedAsync()
+    {
+        ChatState.OnChange += HandleStateChange;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task HandleStateChange()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ChatState.OnChange -= HandleStateChange;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
