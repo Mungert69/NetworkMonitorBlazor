@@ -20,8 +20,7 @@ namespace NetworkMonitorBlazor.Services
         private CancellationTokenSource _cancellationTokenSource;
         private string _siteId; // Remove readonly since we need to assign it later
         private readonly ILLMService _llmService;
-        private string _currentSessionId; // Add this field
-
+    
         public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
         {
             _chatState = chatState;
@@ -30,36 +29,47 @@ namespace NetworkMonitorBlazor.Services
             _cancellationTokenSource = new CancellationTokenSource();
             _llmService = llmService;
             _siteId = string.Empty;
-            _currentSessionId = string.Empty;
-        }
+          }
 
-        public async Task Initialize(string siteId, string sessionId)
-        {
-            _siteId = siteId;
-            _currentSessionId = sessionId;
+        public async Task Initialize(string siteId)
+{
+    _siteId = siteId;
 
-            try
-            {
-                await ConnectWebSocket();
-                var timeZone = TimeZoneInfo.Local.Id;
-                var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{sessionId}";
-                await Send(sendStr);
-                Console.WriteLine($"WebSocket initialized for session: {sessionId}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
-                await Reconnect();
-            }
-        }
+    try
+    {
+        await ConnectWebSocket(); // This now JUST connects without sending init message
+        await SendInitialization(); // Send init message separately
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"WebSocket initialization failed: {ex}");
+       // await Reconnect();
+    }
+}
+private async Task SendInitialization()
+{
+    try 
+    {
+        var timeZone = TimeZoneInfo.Local.Id;
+        var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{_chatState.SessionId}";
+        await Send(sendStr);
+        Console.WriteLine($"Sent initialization: {sendStr}");
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error sending initialization: {ex}");
+        throw;
+    }
+}
 
+      
 
 
         public async Task<bool> VerifySession()
         {
             try
             {
-                await Send($"<|VERIFY_SESSION|{_currentSessionId}|>");
+                await Send($"<|VERIFY_SESSION|{_chatState.SessionId}|>");
                 return true;
             }
             catch
@@ -67,34 +77,26 @@ namespace NetworkMonitorBlazor.Services
                 return false;
             }
         }
-        private async Task ConnectWebSocket()
-        {
-            try
-            {
-                _webSocket = new ClientWebSocket();
-                var serverUrl = _llmService.GetLLMServerUrl(_siteId);
-                await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
-                Console.WriteLine($"WebSocket connection established to {serverUrl}");
+private async Task ConnectWebSocket()
+{
+    try
+    {
+       
 
-                // Send initial connection message
-                var timeZone = TimeZoneInfo.Local.Id;
-                var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{_chatState.SessionId}";
-                await Send(sendStr);
-                Console.WriteLine($"Sent opening message to websocket: {sendStr}");
-
-                // Start listening for messages
-                _ = Task.Run(ReceiveMessages, _cancellationTokenSource.Token);
-
-                // Start ping interval
-                _ = Task.Run(PingInterval, _cancellationTokenSource.Token);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"WebSocket connection error: {ex}");
-                await Reconnect();
-            }
-        }
-
+        _webSocket = new ClientWebSocket();
+        var serverUrl = _llmService.GetLLMServerUrl(_siteId);
+        await _webSocket.ConnectAsync(new Uri(serverUrl), _cancellationTokenSource.Token);
+        
+        // Start listening and ping - but DON'T send init message here
+        _ = Task.Run(ReceiveMessages, _cancellationTokenSource.Token);
+        _ = Task.Run(PingInterval, _cancellationTokenSource.Token);
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"WebSocket connection error: {ex}");
+        await Reconnect();
+    }
+}
         private async Task PingInterval()
         {
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
@@ -173,12 +175,15 @@ namespace NetworkMonitorBlazor.Services
             _chatState.LLMFeedback += FilterLLMOutput(message);
         
             
-            _chatState.NotifyStateChanged();
+
         }
     }
     catch (Exception ex)
     {
         Console.Error.WriteLine($"Error processing message: {ex}");
+    }
+    finally{
+            _chatState.NotifyStateChanged();
     }
 }
 
@@ -186,7 +191,7 @@ private void ProcessControlMessage(string message)
 {
     if (message.StartsWith("</llm-error>"))
     {
-        _chatState.Message = new ChatMessage
+        _chatState.Message = new SystemMessage
         {
             Persist = true,
             Text = message.Substring("</llm-error>".Length),
@@ -195,7 +200,7 @@ private void ProcessControlMessage(string message)
     }
     else if (message.StartsWith("</llm-info>"))
     {
-        _chatState.Message = new ChatMessage
+        _chatState.Message = new SystemMessage
         {
             Info = "",
             Text = message.Substring("</llm-info>".Length)
@@ -203,7 +208,7 @@ private void ProcessControlMessage(string message)
     }
     else if (message.StartsWith("</llm-warning>"))
     {
-        _chatState.Message = new ChatMessage
+        _chatState.Message = new SystemMessage
         {
             Warning = "",
             Text = message.Substring("</llm-warning>".Length)
@@ -211,7 +216,7 @@ private void ProcessControlMessage(string message)
     }
     else if (message.StartsWith("</llm-success>"))
     {
-        _chatState.Message = new ChatMessage
+        _chatState.Message = new SystemMessage
         {
             Success = true,
             Text = message.Substring("</llm-success>".Length)
@@ -362,19 +367,91 @@ private void ProcessControlMessage(string message)
             Console.WriteLine("Message sent: <|STOP_LLM|>");
         }
 
-        public async Task ResetSessionId()
+        public async Task ResetLLM(bool createNewSession = true)
+{
+    try
+    {
+
+        // Reset chat state
+        _chatState.IsReady = false;
+        _chatState.IsMuted = true;
+        _chatState.LLMFeedback = "";
+        _chatState.IsProcessing = false;
+        _chatState.IsLLMBusy = false;
+        _chatState.IsCallingFunction = false;
+        _chatState.ThinkingDots = "";
+        _chatState.CallingFunctionMessage = "Processing function...";
+        _chatState.ShowHelpMessage = false;
+        _chatState.HelpMessage = "";
+        _chatState.CurrentMessage = "";
+
+        // Create new session if requested
+        if (createNewSession)
         {
-            await SendMessage("<|REMOVE_SESSION|>");
-            Console.WriteLine("Message sent: <|REMOVE_SESSION|>");
-
-            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
-            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
-
-            var newSessionId = Guid.NewGuid().ToString();
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
-            _chatState.SessionId = newSessionId;
+            await _chatState.ClearSession();
         }
+
+        // Reinitialize connection
+        await ConnectWebSocket();
+        await SendInitialization();
+
+        _chatState.NotifyStateChanged();
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"LLM reset error: {ex}");
+        await Reconnect();
+    }
+}
+
+// Modified Dispose
+public void Dispose()
+{
+    try
+    {
+        _cancellationTokenSource.Cancel();
+        
+        if (_webSocket?.State == WebSocketState.Open)
+        {
+            _webSocket.CloseAsync(
+                WebSocketCloseStatus.NormalClosure,
+                "Disposing",
+                CancellationToken.None).Wait(3000);
+        }
+    }
+    finally
+    {
+        _webSocket?.Dispose();
+        _cancellationTokenSource.Dispose();
+    }
+}
+
+
+
+public async Task CloseConnection()
+{
+    try
+    {
+        if (_webSocket?.State == WebSocketState.Open)
+        {
+            await _webSocket.CloseAsync(
+                WebSocketCloseStatus.NormalClosure,
+                "Closing connection",
+                _cancellationTokenSource.Token);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error closing WebSocket: {ex}");
+    }
+    finally
+    {
+        _webSocket?.Dispose();
+        _webSocket = null;
+    }
+}
+
+      
 
         private async Task WaitForWebSocket()
         {
@@ -383,6 +460,8 @@ private void ProcessControlMessage(string message)
                 await Task.Delay(100, _cancellationTokenSource.Token);
             }
         }
+
+        
 
         private async Task Send(string message)
         {
@@ -397,14 +476,10 @@ private void ProcessControlMessage(string message)
         {
             // Wait before reconnecting
             await Task.Delay(5000, _cancellationTokenSource.Token);
-            await Initialize(_siteId, _currentSessionId);
+            await Initialize(_siteId);
         }
 
-        public void Dispose()
-        {
-            _cancellationTokenSource.Cancel();
-            _webSocket?.Dispose();
-        }
+      
 
         private class FunctionData
         {

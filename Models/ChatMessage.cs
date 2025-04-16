@@ -3,10 +3,8 @@ namespace NetworkMonitorBlazor.Models
 {
     public class ChatMessage
     {
-        public bool Success { get; set; }
-        public string? Info { get; set; }
-        public string Text { get; set; } = string.Empty;
-        public bool Persist { get; set; }
-        public string? Warning { get; set; }
+        public string Role { get; set; } = string.Empty;  // "user" or "assistant"
+        public string Content { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
 }

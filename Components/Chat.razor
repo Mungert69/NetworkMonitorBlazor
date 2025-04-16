@@ -240,11 +240,15 @@
         await ScrollToBottomIfNeeded();
     }
 
-    private async Task InitializeChat()
+     private async Task InitializeChat()
     {
+    
+
         await ChatState.Initialize(InitRunnerType);
-        await WebSocketService.Initialize(SiteId, ChatState.SessionId);
+        await WebSocketService.Initialize(SiteId); // No longer passing sessionId here
     }
+
+   
 
     private async Task ScrollToBottomIfNeeded()
     {
@@ -264,27 +268,15 @@
         return "position: fixed; bottom: 20px; right: 20px; width: 380px; height: calc(100% - 90px); max-height: 80vh;";
     }
 
-    private async Task ResetChat()
+ private async Task ResetChat()
     {
-        await WebSocketService.SendMessage("<|REMOVE_SESSION|>");
-        await ClearLocalStorage();
-        
-        var newSessionId = Guid.NewGuid().ToString();
-        await StoreSessionId(newSessionId);
-        ChatState.SessionId = newSessionId;
-    }
+        await WebSocketService.ResetLLM(); // This will generate a new session ID
+         }
 
-    private async Task ClearLocalStorage()
-    {
-        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
-        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
-    }
+   
 
-    private async Task StoreSessionId(string sessionId)
-    {
-        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", sessionId);
-        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
-    }
+
+
 
     private async Task ProcessAudioBlob(byte[] audioBlob)
     {
@@ -383,15 +375,16 @@
 
     private async Task HandleSelectSession(string selectedSessionId)
     {
-        ChatState.SessionId = selectedSessionId;
+       ChatState.StoreNewSessionID(selectedSessionId);
         ChatState.OpenMessage = "<|REPLAY_HISTORY|>";
         await ReloadHistory();
     }
 
     private async Task HandleDeleteSession(string fullSessionId)
     {
-        await WebSocketService.SendMessage("<|REMOVE_SAVED_SESSION|>" + fullSessionId);
+        await WebSocketService.SendMessage($"<|REMOVE_SAVED_SESSION|>{fullSessionId}");
     }
+
 
     private async Task ReloadHistory()
     {

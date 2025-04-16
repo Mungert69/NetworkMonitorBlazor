@@ -16,7 +16,7 @@ namespace NetworkMonitorBlazor.Services
         public bool AutoScrollEnabled { get; set; } = true;
 
         // Processing and loading states
-        public bool IsReady { get; set; } = false;
+        public bool IsReady { get; set; } = true;
         public int LoadCount { get; set; } = 0;
         public string LoadWarning { get; set; } = "";
         public bool IsProcessing { get; set; } = false;
@@ -31,15 +31,23 @@ namespace NetworkMonitorBlazor.Services
         public string HelpMessage { get; set; } = "";
         public string CurrentMessage { get; set; } = "";
         public bool IsDashboard { get; set; }
-        public ChatMessage Message { get; set; } = new ChatMessage
+
+        private string _sessionId;
+
+        public string SessionId
+        {
+            get => _sessionId;
+            set
+            {
+                _sessionId = value;
+            }
+        }
+        public SystemMessage Message { get; set; } = new SystemMessage
         {
             Info = "init",
             Success = false,
             Text = "Internal Error"
         };
-
-        public event Action? OnChange = null; // Mark as nullable
-
 
         // In ChatStateService.cs
         public string LLMFeedback
@@ -71,7 +79,6 @@ namespace NetworkMonitorBlazor.Services
         public bool IsInputFocused { get; set; } = false;
 
         // Session management
-        public string SessionId { get; set; }
         public string LLMRunnerTypeRef { get; set; }
         public string OpenMessage { get; set; }
         public bool AutoClickedRef { get; set; } = false;
@@ -88,22 +95,22 @@ namespace NetworkMonitorBlazor.Services
         {
             LLMRunnerType = initRunnerType;
             LLMRunnerTypeRef = initRunnerType;
-            SessionId = await CreateNewSession();
-            NotifyStateChanged();
+            SessionId = await GetSessionId();
         }
         public async Task ClearSession()
         {
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionId");
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionTimestamp");
-            SessionId = string.Empty;
-            NotifyStateChanged();
+            SessionId = await GetSessionId();
         }
-        private async Task<string> CreateNewSession()
+
+
+        public async Task StoreNewSessionID(string newSessionId)
         {
-            var newSessionId = Guid.NewGuid().ToString();
+            SessionId=newSessionId;
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionId", newSessionId);
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
-            return newSessionId;
+
         }
 
         private async Task<string> GetSessionId()
@@ -133,6 +140,9 @@ namespace NetworkMonitorBlazor.Services
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionTimestamp", DateTime.Now.Ticks.ToString());
             return newSessionId;
         }
+
+        public event Action? OnChange = null; // Mark as nullable
+
 
         public void NotifyStateChanged() => OnChange?.Invoke();
     }
