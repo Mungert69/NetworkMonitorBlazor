@@ -55,15 +55,25 @@ window.chatInterop = {
     },
 
     // File download
-    downloadFile: (filename, text) => {
-        const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+    downloadFile: function(filename, content, contentType) {
+        // Create a blob with the content
+        const blob = new Blob([content], { type: contentType || 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create a temporary anchor element
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
     },
+    
     scrollToBottom: function(element) {
         element.scrollTop = element.scrollHeight;
     }

@@ -21,24 +21,25 @@
     --radius-xl: 16px;
     --transition: all 0.2s ease;
 }
+
   
   /* Main Container */
   .chat-container {
     position: fixed !important;
+    display: flex !important;
+    flex-direction: column !important;
   box-sizing: border-box;
     bottom: 20px;
     right: 20px;
     width: 380px;
     height: 600px;
     max-height: 80vh;
-    display: flex;
-    flex-direction: column;
     background-color: var(--background);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     z-index: 10000;
     transition: var(--transition);
-    overflow: visible;
+     overflow: auto; 
   }
   
   .chat-container.expanded {
@@ -54,12 +55,20 @@
   }
   
   .chat-card {
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    overflow: hidden;
     border-radius: 0;
   }
   
   /* Header */
   .chat-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    flex-shrink: 0;
     background-color: var(--primary);
     border-bottom: 1px solid var(--primary-dark);
     padding: 14px 18px;

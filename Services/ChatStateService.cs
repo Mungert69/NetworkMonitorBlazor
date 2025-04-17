@@ -71,8 +71,6 @@ namespace NetworkMonitorBlazor.Services
             }
         }
         private List<ChatHistory> _histories = new();
-
-        // Data states
         public List<HostLink> LinkData { get; set; } = new List<HostLink>();
         public string LLMRunnerType { get; set; } = "TurboLLM";
         public bool IsHoveringMessages { get; set; } = false;

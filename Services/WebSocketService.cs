@@ -175,7 +175,21 @@ namespace NetworkMonitorBlazor.Services
             try
             {
                 Console.WriteLine($"Received message: {message}");
+                if (message.StartsWith("<function-data>") && message.EndsWith("</function-data>"))
+                {
+                    // Extract the function data
+                    var functionData = message.Substring("<function-data>".Length,
+                        message.Length - "<function-data>".Length - "</function-data>".Length);
+                    Console.WriteLine($"Found function data: {functionData}");
 
+                    var generatedLinkData = ProcessFunctionData(functionData);
+                    if (generatedLinkData != null)
+                    {
+                        _chatState.LinkData = generatedLinkData;
+                        _chatState.IsDrawerOpen = true;
+                    }
+                    return;
+                }
                 // Handle control messages first
                 if (message.StartsWith("</llm-"))
                 {
@@ -210,12 +224,14 @@ namespace NetworkMonitorBlazor.Services
             }
             finally
             {
-               await  _chatState.NotifyStateChanged();
+                await _chatState.NotifyStateChanged();
             }
         }
 
         private void ProcessControlMessage(string message)
         {
+
+
             if (message.StartsWith("</llm-error>"))
             {
                 _chatState.Message = new SystemMessage
@@ -424,10 +440,8 @@ namespace NetworkMonitorBlazor.Services
                     await _chatState.ClearSession();
                 }
 
-                // Reinitialize connection
                 await ConnectWebSocket();
                 await SendInitialization();
-
                 await _chatState.NotifyStateChanged();
             }
             catch (Exception ex)

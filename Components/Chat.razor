@@ -37,13 +37,17 @@
                         <span class="tooltip">Toggle LLM Type</span>
                     </button>
                     
-                    @if (!ChatState.IsDrawerOpen)
-                    {
-                        <button @onclick="() => ToggleDrawer(true)" disabled="@(!ChatState.IsReady)" aria-label="Open links">
-                            <i class="material-icons">keyboard_arrow_up</i>
-                            <span class="tooltip">Open Links</span>
-                        </button>
-                    }
+                   <button @onclick="() => ToggleDrawer(!ChatState.IsDrawerOpen)" 
+            class="drawer-toggle"
+            aria-label="@(ChatState.IsDrawerOpen ? "Close links drawer" : "Open links drawer")">
+        <i class="material-icons">
+            @(ChatState.IsDrawerOpen ? "keyboard_arrow_down" : "keyboard_arrow_up")
+        </i>
+        <span class="tooltip">
+            @(ChatState.IsDrawerOpen ? "Close Links" : "Open Links")
+        </span>
+    </button>
+    
                     
                     <button @onclick="ToggleExpand" aria-label="@(ChatState.IsExpanded ? "Contract" : "Expand")">
                         @if (ChatState.IsExpanded)
@@ -128,18 +132,15 @@
             }
         </div>
 
-        @* Links Drawer *@
-        <div class="drawer @(ChatState.IsDrawerOpen ? "open" : "")">
-            <div class="drawer-header">
-                <h3>Available Links</h3>
-                <button @onclick="() => ToggleDrawer(false)" class="close-drawer" aria-label="Close drawer">
-                  <i class="material-icons">keyboard_arrow_down</i>
-                </button>
-            </div>
-            <div class="drawer-content">
-                @RenderLinks()
-            </div>
-        </div>
+        @* Links Drawer - simplified since toggle is in header *@
+<div class="drawer @(ChatState.IsDrawerOpen ? "open" : "")">
+    <div class="drawer-header">
+        <h3>Available Links</h3>
+    </div>
+    <div class="drawer-content">
+        @RenderLinks()
+    </div>
+</div>
 
        @* History Popper - Already implemented as a popup *@
 @if (IsHistoryOpen)
@@ -204,13 +205,14 @@
                 </div>
             </div>
         </div>
-        <MessageDisplay Message="ChatState.Message" />
+        
     </div>
 </div>
 
 
 
 @code {
+    //<MessageDisplay Message="ChatState.Message" />
     private ElementReference outputContainerRef;
     private ElementReference historyButtonRef;
     private bool IsHistoryOpen = false;
@@ -231,7 +233,12 @@
     [Parameter]
     public string SiteId { get; set; } = "";
 
-     
+     private async Task HandleLLMReady()
+{
+    await Task.Delay(5000);
+    ChatState.IsToggleDisabled = false;
+    StateHasChanged();
+}
     protected override async Task OnInitializedAsync()
     {
         ChatState.OnChange += HandleStateChange;
@@ -240,6 +247,11 @@
 
     private async Task HandleStateChange()
     {
+         if (ChatState.IsReady && ChatState.IsToggleDisabled)
+    {
+        // Only start the delay if we're in a toggle-disabled state
+        _ = HandleLLMReady(); // Fire and forget
+    }
         await InvokeAsync(StateHasChanged);
     }
 
