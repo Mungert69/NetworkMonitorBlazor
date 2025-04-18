@@ -1,7 +1,4 @@
 @page "/"
-@using NetworkMonitorBlazor.Services
-@using NetworkMonitorBlazor.Models
-@using System.Text
 @inject ChatStateService ChatState
 @inject IJSRuntime JSRuntime
 @inject WebSocketService WebSocketService
@@ -300,7 +297,7 @@
 
  private async Task ResetChat()
     {
-        await WebSocketService.ResetLLM(); // This will generate a new session ID
+        await WebSocketService.ResetLLM(true); // This will generate a new session ID
          }
 
    
@@ -405,8 +402,10 @@
 
     private async Task HandleSelectSession(string selectedSessionId)
     {
-       ChatState.StoreNewSessionID(selectedSessionId);
-        ChatState.OpenMessage = "<|REPLAY_HISTORY|>";
+        
+       await ChatState.StoreNewSessionID(selectedSessionId);
+        await WebSocketService.ResetLLM(false); 
+   
         await ReloadHistory();
     }
 
@@ -418,23 +417,31 @@
 
     private async Task ReloadHistory()
     {
-        await WebSocketService.SendMessage(ChatState.OpenMessage);
+        await WebSocketService.SendMessage("<|REPLAY_HISTORY|>");
     }
 
-    private void ToggleLLMRunnerType()
-    {
-        if (ChatState.IsToggleDisabled) return;
-        
-        ChatState.OpenMessage = "<|REPLAY_HISTORY|>";
-        ChatState.IsToggleDisabled = true;
+   private async Task ToggleLLMRunnerType()
+{
+    if (ChatState.IsToggleDisabled) return;
+    
+    // 1. Set toggle disabled immediately
+    ChatState.IsToggleDisabled = true;
+    
+    // 2. Update the LLM type first
+    var types = LLMService.GetLLMTypes();
+    var currentIndex = types.IndexOf(ChatState.LLMRunnerTypeRef);
+    var nextIndex = (currentIndex + 1) % types.Count;
+    
+    ChatState.LLMRunnerTypeRef = types[nextIndex];
+    ChatState.LLMRunnerType = types[nextIndex];
+    
+    await WebSocketService.ResetLLM(false); 
+    
+    // 4. Only AFTER reset is complete, send the replay history
+    await WebSocketService.SendMessage("<|REPLAY_HISTORY|>");
+    
+}
 
-        var types = LLMService.GetLLMTypes();
-        var currentIndex = types.IndexOf(ChatState.LLMRunnerTypeRef);
-        var nextIndex = (currentIndex + 1) % types.Count;
-        
-        ChatState.LLMRunnerTypeRef = types[nextIndex];
-        ChatState.LLMRunnerType = types[nextIndex];
-    }
 
     private async Task SaveFeedback()
     {
