@@ -406,19 +406,13 @@
        await ChatState.StoreNewSessionID(selectedSessionId);
         await WebSocketService.ResetLLM(false); 
    
-        await ReloadHistory();
-    }
+        }
 
     private async Task HandleDeleteSession(string fullSessionId)
     {
         await WebSocketService.SendMessage($"<|REMOVE_SAVED_SESSION|>{fullSessionId}");
     }
 
-
-    private async Task ReloadHistory()
-    {
-        await WebSocketService.SendMessage("<|REPLAY_HISTORY|>");
-    }
 
    private async Task ToggleLLMRunnerType()
 {

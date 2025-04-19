@@ -26,7 +26,8 @@ namespace NetworkMonitorBlazor.Services
         private const int MaxReconnectAttempts = 5;
         private bool _isReconnecting = false;
         private readonly object _reconnectLock = new object();
-
+        private string _queuedReplayMessage;
+        private bool _isConnectionReady;
         public WebSocketService(ChatStateService chatState, IJSRuntime jsRuntime, AudioService audioService, ILLMService llmService)
         {
             _chatState = chatState;
@@ -40,6 +41,8 @@ namespace NetworkMonitorBlazor.Services
         public async Task Initialize(string siteId)
         {
             _siteId = siteId;
+            _queuedReplayMessage = "<|REPLAY_HISTORY|>";
+            _isConnectionReady = false;
 
             try
             {
@@ -59,6 +62,7 @@ namespace NetworkMonitorBlazor.Services
                 var sendStr = $"{timeZone},{_chatState.LLMRunnerTypeRef},{_chatState.SessionId}";
                 await Send(sendStr);
                 Console.WriteLine($"Sent initialization: {sendStr}");
+              
             }
             catch (Exception ex)
             {
@@ -68,20 +72,6 @@ namespace NetworkMonitorBlazor.Services
         }
 
 
-
-
-        public async Task<bool> VerifySession()
-        {
-            try
-            {
-                await Send($"<|VERIFY_SESSION|{_chatState.SessionId}|>");
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
         private async Task ConnectWebSocket()
         {
             try
@@ -174,6 +164,13 @@ namespace NetworkMonitorBlazor.Services
         {
             try
             {
+
+                if (message == "</llm-ready>")
+                {
+                    _isConnectionReady = true;
+                    _chatState.IsReady = true;
+                    await TrySendQueuedMessage();
+                }
                 Console.WriteLine($"Received message: {message}");
                 if (message.StartsWith("<function-data>") && message.EndsWith("</function-data>"))
                 {
@@ -228,6 +225,15 @@ namespace NetworkMonitorBlazor.Services
             }
         }
 
+
+        private async Task TrySendQueuedMessage()
+        {
+            if (_isConnectionReady && !string.IsNullOrEmpty(_queuedReplayMessage))
+            {
+                await Send(_queuedReplayMessage);
+                _queuedReplayMessage = null;
+            }
+        }
         private void ProcessControlMessage(string message)
         {
 
@@ -264,10 +270,6 @@ namespace NetworkMonitorBlazor.Services
                     Success = true,
                     Text = message.Substring("</llm-success>".Length)
                 };
-            }
-            else if (message == "</llm-ready>")
-            {
-                _chatState.IsReady = true;
             }
             else if (message == "</functioncall>")
             {
