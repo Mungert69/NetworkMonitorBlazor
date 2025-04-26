@@ -12,10 +12,18 @@ window.chatInterop = {
         }
     },
 
-    clearAudioQueue: () => {
-        // Implementation depends on your audio queue system
-        console.log('Clearing audio queue');
+    playAudioWithCallback: (audioFile, dotnetRef) => {
+        const audio = new Audio(audioFile);
+        audio.play().catch(e => {
+            console.error("Audio playback failed:", e);
+            dotnetRef.invokeMethodAsync('OnAudioEnded');
+        });
+        audio.onended = () => {
+            dotnetRef.invokeMethodAsync('OnAudioEnded');
+            dotnetRef.dispose();
+        };
     },
+
 
     // Audio recording
     startRecording: async () => {
@@ -31,7 +39,7 @@ window.chatInterop = {
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 const arrayBuffer = await audioBlob.arrayBuffer();
-                DotNet.invokeMethodAsync('NetworkMonitorBlazor', 'ReceiveAudioBlob', arrayBuffer);
+                DotNet.invokeMethodAsync('NetworkMonitorAgent', 'ReceiveAudioBlob', arrayBuffer);
             };
             
             mediaRecorder.start();

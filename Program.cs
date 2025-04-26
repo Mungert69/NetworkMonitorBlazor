@@ -1,37 +1,75 @@
-using NetworkMonitorBlazor.Services;
+using NetworkMonitorAgent;
+using NetworkMonitor.Connection;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Server.Circuits; // Add this for CircuitHandler
-using Microsoft.Extensions.Logging; // For ILogger
+using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+// Build configuration first
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+    .AddEnvironmentVariables()
+    .Build();
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add the pre-built configuration to the builder
+builder.Configuration.AddConfiguration(configuration);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor(options =>
 {
-    options.DetailedErrors = true;  // Enable detailed errors
+    options.DetailedErrors = true;
     options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(5);
 });
 
-// Register services with proper lifecycle management
-builder.Services.AddScoped<ChatStateService>();
-builder.Services.AddScoped<WebSocketService>();
-builder.Services.AddScoped<AudioService>();
+// Configure NetConnectConfig with proper file loading
+builder.Services.AddSingleton<NetConnectConfig>(provider =>
+{
+    // Get the configuration from DI
+    var config = provider.GetRequiredService<IConfiguration>();
+    
+    // For Blazor Server, use ContentRootPath instead of AppDataDirectory
+    var dataPath = Path.Combine(builder.Environment.ContentRootPath, "Data");
+    
+    // Ensure directory exists
+    Directory.CreateDirectory(dataPath);
+    
+    return new NetConnectConfig(config, dataPath);
+});
+
+// Rest of your service registrations...
 builder.Services.AddScoped<ILLMService, LLMService>();
-builder.Services.AddScoped<LLMService>();
+builder.Services.AddScoped<AudioService>(provider =>
+    new AudioService(provider.GetService<IJSRuntime>()));
+builder.Services.AddScoped<ChatStateService>(provider =>
+    new ChatStateService(provider.GetService<IJSRuntime>()));
+
+builder.Services.AddScoped<WebSocketService>(provider => 
+    new WebSocketService(
+        provider.GetRequiredService<ChatStateService>(),
+        provider.GetService<IJSRuntime>(),
+        provider.GetRequiredService<AudioService>(),
+        provider.GetRequiredService<ILLMService>(),
+        provider.GetRequiredService<NetConnectConfig>()));
+
 builder.Services.AddScoped<CircuitHandler, CircuitHandlerService>();
 
-// Configure Kestrel ports
+// Configure Kestrel
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(5225); // HTTP
-   
+    serverOptions.ListenAnyIP(5225);
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -42,9 +80,7 @@ else
     app.UseDeveloperExceptionPage();
 }
 
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapBlazorHub(options =>
@@ -56,7 +92,7 @@ app.MapFallbackToPage("/_Host");
 
 app.Run();
 
-// Circuit handler service
+// CircuitHandlerService implementation remains the same
 public class CircuitHandlerService : CircuitHandler
 {
     private readonly ILogger<CircuitHandlerService> _logger;
