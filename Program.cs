@@ -34,13 +34,13 @@ builder.Services.AddSingleton<NetConnectConfig>(provider =>
 {
     // Get the configuration from DI
     var config = provider.GetRequiredService<IConfiguration>();
-    
+
     // For Blazor Server, use ContentRootPath instead of AppDataDirectory
     var dataPath = Path.Combine(builder.Environment.ContentRootPath, "Data");
-    
+
     // Ensure directory exists
     Directory.CreateDirectory(dataPath);
-    
+
     return new NetConnectConfig(config, dataPath);
 });
 
@@ -51,7 +51,7 @@ builder.Services.AddScoped<AudioService>(provider =>
 builder.Services.AddScoped<ChatStateService>(provider =>
     new ChatStateService(provider.GetService<IJSRuntime>()));
 
-builder.Services.AddScoped<WebSocketService>(provider => 
+builder.Services.AddScoped<WebSocketService>(provider =>
     new WebSocketService(
         provider.GetRequiredService<ChatStateService>(),
         provider.GetService<IJSRuntime>(),
@@ -102,21 +102,21 @@ public class CircuitHandlerService : CircuitHandler
         _logger = logger;
     }
 
-    public override Task OnCircuitOpenedAsync(Circuit circuit, 
+    public override Task OnCircuitOpenedAsync(Circuit circuit,
         CancellationToken cancellationToken)
     {
         _logger.LogInformation("Circuit opened: {CircuitId}", circuit.Id);
         return Task.CompletedTask;
     }
 
-    public override Task OnConnectionDownAsync(Circuit circuit, 
+    public override Task OnConnectionDownAsync(Circuit circuit,
         CancellationToken cancellationToken)
     {
         _logger.LogWarning("Connection down: {CircuitId}", circuit.Id);
         return Task.CompletedTask;
     }
 
-    public override Task OnCircuitClosedAsync(Circuit circuit, 
+    public override Task OnCircuitClosedAsync(Circuit circuit,
         CancellationToken cancellationToken)
     {
         _logger.LogInformation("Circuit closed: {CircuitId}", circuit.Id);
