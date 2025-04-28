@@ -61,8 +61,14 @@ window.chatInterop = {
         console.error("Media devices not supported");
         return false;
       }
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+            sampleRate: 16000,  // Suggest preferred rate (browser may ignore)
+            channelCount: 1,    // Force mono
+            noiseSuppression: true,
+            echoCancellation: true
+        } 
+    });
       console.log("Got media stream");
       
       const options = { mimeType: 'audio/webm' };
@@ -96,85 +102,74 @@ window.chatInterop = {
     }
   },
   
-  stopRecording: function(sessionId) {
-    console.log("stopRecording called with sessionId:", sessionId);
-    console.log("this.recordingHandles:", this.recordingHandles);
-    
-    // If recordingHandles is empty but we know we're recording, recreate the object
-    if (!this.recordingHandles || Object.keys(this.recordingHandles).length === 0) {
-      console.warn("recordingHandles is empty, this may be due to a page refresh or navigation");
-    }
-    
-    const recorderObj = this.recordingHandles ? this.recordingHandles[sessionId] : null;
-    console.log("recorderObj:", recorderObj);
-    
-    if (!recorderObj || !recorderObj.mediaRecorder) {
-      console.error("No valid recorder found for session:", sessionId);
+  stopRecording: async function (sessionId) {
+    const recorderObj = window.chatInterop.recordingHandles?.[sessionId];
+    if (!recorderObj) {
+      console.error('No recorder found for sessionId:', sessionId);
       return null;
     }
-    
-    return new Promise((resolve) => {
-      const handleAudioData = () => {
-        try {
-          if (!recorderObj.audioChunks || recorderObj.audioChunks.length === 0) {
-            console.error("No audio chunks available");
-            resolve(null);
-            return;
-          }
-          
-          const audioBlob = new Blob(recorderObj.audioChunks, { type: 'audio/webm' });
-          console.log("Audio blob created, size:", audioBlob.size);
-          
-          const reader = new FileReader();
-          reader.onloadend = function() {
-            try {
-              const base64data = reader.result.split(',')[1];
-              console.log("Base64 conversion complete, length:", base64data.length);
-              
-              // Clean up
-              if (recorderObj.stream) {
-                recorderObj.stream.getTracks().forEach(track => track.stop());
-              }
-              
-              // Make sure we use the right context for cleanup
-              if (window.chatInterop.recordingHandles) {
-                delete window.chatInterop.recordingHandles[sessionId];
-              }
-              
-              resolve(base64data);
-            } catch (err) {
-              console.error("Error in reader.onloadend:", err);
+
+    return new Promise((resolve, reject) => {
+      if (!recorderObj.mediaRecorder) {
+        console.error('MediaRecorder not found');
+        resolve(null);
+        return;
+      }
+
+      if (recorderObj.mediaRecorder.state !== 'inactive') {
+        recorderObj.mediaRecorder.onstop = async () => {
+          try {
+            if (!recorderObj.audioChunks || recorderObj.audioChunks.length === 0) {
+              console.error('No audio chunks');
               resolve(null);
+              return;
             }
-          };
-          
-          reader.onerror = function() {
-            console.error("FileReader error");
+
+            const audioBlob = new Blob(recorderObj.audioChunks, { type: 'audio/webm' });
+            const arrayBuffer = await audioBlob.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+
+            // Clean up
+            if (recorderObj.stream) {
+              recorderObj.stream.getTracks().forEach(track => track.stop());
+            }
+            delete window.chatInterop.recordingHandles[sessionId];
+
+            resolve(uint8Array);
+          } catch (err) {
+            console.error('Error handling audio data:', err);
             resolve(null);
-          };
-          
-          reader.readAsDataURL(audioBlob);
+          }
+        };
+
+        try {
+          recorderObj.mediaRecorder.stop();
         } catch (err) {
-          console.error("Error handling audio data:", err);
+          console.error('Error stopping mediaRecorder:', err);
           resolve(null);
         }
-      };
-      
-      try {
-        if (recorderObj.mediaRecorder.state !== "inactive") {
-          recorderObj.mediaRecorder.onstop = handleAudioData;
-          recorderObj.mediaRecorder.stop();
-        } else {
-          console.log("MediaRecorder already inactive");
-          handleAudioData();
-        }
-      } catch (err) {
-        console.error("Error stopping recorder:", err);
-        resolve(null);
+      } else {
+        console.log('MediaRecorder already inactive, creating blob immediately');
+        (async () => {
+          try {
+            const audioBlob = new Blob(recorderObj.audioChunks, { type: 'audio/webm' });
+            const arrayBuffer = await audioBlob.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+
+            if (recorderObj.stream) {
+              recorderObj.stream.getTracks().forEach(track => track.stop());
+            }
+            delete window.chatInterop.recordingHandles[sessionId];
+
+            resolve(uint8Array);
+          } catch (err) {
+            console.error('Error creating blob from inactive recorder:', err);
+            resolve(null);
+          }
+        })();
       }
     });
-  },
-  // File download
+  }, // File download
     downloadFile: function (filename, content, contentType) {
         // Create a blob with the content
         const blob = new Blob([content], { type: contentType || 'application/octet-stream' });

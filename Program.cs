@@ -27,6 +27,7 @@ builder.Services.AddServerSideBlazor(options =>
 {
     options.DetailedErrors = true;
     options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(5);
+    options.JSInteropDefaultCallTimeout = TimeSpan.FromSeconds(60);
 });
 
 // Configure NetConnectConfig with proper file loading
@@ -47,7 +48,7 @@ builder.Services.AddSingleton<NetConnectConfig>(provider =>
 // Rest of your service registrations...
 builder.Services.AddScoped<ILLMService, LLMService>();
 builder.Services.AddScoped<AudioService>(provider =>
-    new AudioService(provider.GetService<IJSRuntime>()));
+    new AudioService(provider.GetService<IJSRuntime>(), provider.GetRequiredService<NetConnectConfig>()));
 builder.Services.AddScoped<ChatStateService>(provider =>
     new ChatStateService(provider.GetService<IJSRuntime>()));
 
@@ -59,7 +60,7 @@ builder.Services.AddScoped<WebSocketService>(provider =>
         provider.GetRequiredService<ILLMService>(),
         provider.GetRequiredService<NetConnectConfig>()));
 
-builder.Services.AddScoped<CircuitHandler, CircuitHandlerService>();
+//builder.Services.AddScoped<CircuitHandler, CircuitHandlerService>();
 
 // Configure Kestrel
 builder.WebHost.ConfigureKestrel(serverOptions =>
