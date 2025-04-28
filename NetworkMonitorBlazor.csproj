@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.4" />
     <PackageReference Include="Microsoft.JSInterop" Version="9.0.4" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
  <ItemGroup>
                 <ProjectReference Include="..\NetworkMonitor\NetworkMonitor.csproj" />
