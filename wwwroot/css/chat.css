@@ -840,15 +840,12 @@ textarea {
 .notification-container {
   position: fixed;
   bottom: 20px;
-  left: 50%; /* Center horizontally */
-  transform: translateX(-50%); /* Adjust for exact center */
+  right: 20px;
   display: flex;
-  flex-direction: column;
-  align-items: center; /* Center notifications horizontally */
+  flex-direction: column-reverse;
   gap: 10px;
   z-index: 1000;
   max-width: 350px;
-  width: 90%; /* Make it responsive */
 }
 
 .notification {
@@ -857,12 +854,8 @@ textarea {
   border-radius: 6px;
   color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  transition: all 0.3s ease;
-  width: 100%; /* Take full width of container */
-  max-width: 350px; /* But not wider than this */
-  opacity: 0; /* Start invisible */
-  transform: translateY(100px); /* Start position below */
+  animation: slideIn 0.3s ease-out;
+  transition: transform 0.2s ease;
 }
 
 .notification:hover {
@@ -923,16 +916,5 @@ textarea {
   }
   to {
       transform: scaleX(0);
-  }
-}
-
-.notification.exiting {
-  animation: slideDown 0.3s ease forwards;
-}
-
-@keyframes slideDown {
-  to {
-    transform: translateY(100px);
-    opacity: 0;
   }
 }
