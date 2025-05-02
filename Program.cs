@@ -65,7 +65,7 @@ builder.Services.AddScoped<WebSocketService>(provider =>
 // Configure Kestrel
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(7860);
+    serverOptions.ListenAnyIP(7861);
 });
 
 var app = builder.Build();
