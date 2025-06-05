@@ -1,0 +1,2 @@
+sudo mount --bind /home/mahadeva/code/FreeNetworkMonitorAgent/Components/ /home/mahadeva/code/NetworkMonitorBlazor/Components
+
