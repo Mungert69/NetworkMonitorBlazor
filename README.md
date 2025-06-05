@@ -34,8 +34,9 @@ NetworkMonitorBlazor is a Blazor-based web application that provides a real-time
 
 ## Getting Started
 
-1. **Prerequisites**: .NET 6+ SDK, Node.js (for JS interop), and a configured LLM backend server.
+1. **Prerequisites**: .NET 9+ SDK, Node.js (for JS interop), and a configured NetworkMonitorLLM backend server.
 2. **Build and Run**:
    ```bash
    dotnet build
    dotnet run
+   ```
