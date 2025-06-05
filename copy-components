@@ -1,0 +1,8 @@
+#!/bin/bash
+# sync_components.sh
+
+SRC=/home/mahadeva/code/FreeNetworkMonitorAgent/Components/
+DEST=/home/mahadeva/code/NetworkMonitorBlazor/Components/
+
+rsync -av --delete "$SRC" "$DEST"
+
