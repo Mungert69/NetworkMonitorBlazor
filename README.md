@@ -1,6 +1,8 @@
 =======
 # NetworkMonitorBlazor
 
+## A Free Network Monitor Service Component
+
 NetworkMonitorBlazor is a Blazor-based web application that provides a real-time, interactive chat interface for monitoring and managing network hosts using Large Language Models (LLMs). It features a modern chat UI, audio transcription, WebSocket-based communication, and session history management.
 
 ## Features
@@ -40,3 +42,18 @@ NetworkMonitorBlazor is a Blazor-based web application that provides a real-time
    dotnet build
    dotnet run
    ```
+
+
+---
+
+## 🚀 Live Demo and Examples
+
+Explore real-world examples of the system in action:
+
+- 🔬 **ReadyForQuantum Demo (Hugging Face Space)**  
+  Interactive demo showcasing quantum-aware network analysis and LLM-driven diagnostics. Uses NetworkMonitorBlazor inside a docker container.
+  [https://huggingface.co/spaces/Mungert/ReadyForQuantum](https://huggingface.co/spaces/Mungert/ReadyForQuantum)
+
+- 🌐 **Official Project Site**  
+  The Full Free Network Monitor Service in action.  
+  [https://readyforquantum.com](https://readyforquantum.com)
