@@ -57,4 +57,5 @@ Explore real-world examples of the system in action:
 
 - 🌐 **Official Project Site**  
   The Full Free Network Monitor Service in action.  
-  [https://readyforquantum.com](https://readyforquantum.com)
+  [https://readyforquantum.com/?utm_source=github&utm_medium=referral&utm_campaign=readme](https://readyforquantum.com/?utm_source=github&utm_medium=referral&utm_campaign=networkmonitotllm_readme)
+
