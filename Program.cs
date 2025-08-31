@@ -45,27 +45,28 @@ builder.Services.AddSingleton<NetConnectConfig>(provider =>
     return new NetConnectConfig(config, dataPath);
 });
 
-// Rest of your service registrations...
 builder.Services.AddScoped<ILLMService, LLMService>();
-builder.Services.AddScoped<AudioService>(provider =>
-    new AudioService(provider.GetService<IJSRuntime>(), provider.GetRequiredService<NetConnectConfig>()));
+
 builder.Services.AddScoped<ChatStateService>(provider =>
-    new ChatStateService(provider.GetService<IJSRuntime>()));
+    new ChatStateService(provider.GetRequiredService<IJSRuntime>()));
+
+builder.Services.AddScoped<AudioService>(provider =>
+    new AudioService(provider.GetRequiredService<IJSRuntime>(), provider.GetRequiredService<NetConnectConfig>()));
 
 builder.Services.AddScoped<WebSocketService>(provider =>
     new WebSocketService(
         provider.GetRequiredService<ChatStateService>(),
-        provider.GetService<IJSRuntime>(),
+        provider.GetRequiredService<IJSRuntime>(),
         provider.GetRequiredService<AudioService>(),
         provider.GetRequiredService<ILLMService>(),
         provider.GetRequiredService<NetConnectConfig>()));
 
-//builder.Services.AddScoped<CircuitHandler, CircuitHandlerService>();
+builder.Services.AddScoped<CircuitHandler, CircuitHandlerService>();
 
 // Configure Kestrel
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(7860);
+    serverOptions.ListenAnyIP(7861);
 });
 
 var app = builder.Build();

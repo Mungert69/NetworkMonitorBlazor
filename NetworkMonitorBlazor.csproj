@@ -14,16 +14,11 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.8" />
     <PackageReference Include="Microsoft.JSInterop" Version="9.0.8" />
   </ItemGroup>
- <ItemGroup>
-                <ProjectReference Include="..\NetworkMonitorLib\NetworkMonitor.csproj" />
-  </ItemGroup>
+
 
 
         <ItemGroup>
                 <ProjectReference Include="..\NetworkMonitorChatRazorLib\NetworkMonitorChatRazorLib-Linux.csproj" />
         </ItemGroup>
-<ItemGroup>
-  <Content Remove="Components/Routes.razor" />
-  <None Include="Components/Routes.razor" />
-</ItemGroup>
+
 </Project>
