@@ -7,7 +7,7 @@
 			"path": "../NetworkMonitorLib"
 		},
 		{
-			"path": "../FreeNetworkMonitorAgent"
+			"path": "../NetworkMonitorChatRazorLib"
 		}
 	],
 	"settings": {}

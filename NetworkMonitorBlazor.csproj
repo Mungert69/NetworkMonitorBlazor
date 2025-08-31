@@ -16,6 +16,11 @@
   </ItemGroup>
  <ItemGroup>
                 <ProjectReference Include="..\NetworkMonitorLib\NetworkMonitor.csproj" />
+  </ItemGroup>
+
+
+        <ItemGroup>
+                <ProjectReference Include="..\NetworkMonitorChatRazorLib\NetworkMonitorChatRazorLib-Linux.csproj" />
         </ItemGroup>
 <ItemGroup>
   <Content Remove="Components/Routes.razor" />

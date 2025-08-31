@@ -1,4 +1,4 @@
-using NetworkMonitorAgent;
+using NetworkMonitorChat;
 using NetworkMonitor.Connection;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
