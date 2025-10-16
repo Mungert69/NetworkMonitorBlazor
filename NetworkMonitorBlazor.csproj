@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="MarkDig" Version="0.41.3" />
+      <PackageReference Include="MarkDig" Version="0.42.0" />
       <PackageReference Include="MatBlazor" Version="2.10.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.9" />
-    <PackageReference Include="Microsoft.JSInterop" Version="9.0.9" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.10" />
+    <PackageReference Include="Microsoft.JSInterop" Version="9.0.10" />
   </ItemGroup>
 
 
