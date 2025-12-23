@@ -17,7 +17,11 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseStaticWebAssets();
+var wwwrootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+if (Directory.Exists(wwwrootPath))
+{
+    builder.WebHost.UseStaticWebAssets();
+}
 
 // Add the pre-built configuration to the builder
 builder.Configuration.AddConfiguration(configuration);
