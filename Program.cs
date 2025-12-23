@@ -82,6 +82,25 @@ else
     app.UseDeveloperExceptionPage();
 }
 
+var configuredPathBase = builder.Configuration["PATH_BASE"]
+    ?? Environment.GetEnvironmentVariable("ASPNETCORE_PATHBASE");
+if (!string.IsNullOrWhiteSpace(configuredPathBase))
+{
+    app.UsePathBase(configuredPathBase);
+}
+
+app.Use((context, next) =>
+{
+    if (!context.Request.PathBase.HasValue &&
+        context.Request.Headers.TryGetValue("X-Forwarded-Prefix", out var forwardedPrefix) &&
+        !string.IsNullOrWhiteSpace(forwardedPrefix))
+    {
+        context.Request.PathBase = forwardedPrefix.ToString();
+    }
+
+    return next();
+});
+
 app.UseStaticFiles();
 app.UseRouting();
 
