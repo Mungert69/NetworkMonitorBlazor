@@ -7,13 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MarkDig" Version="0.42.0" />
-    <PackageReference Include="MatBlazor" Version="2.10.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.1" />
-  </ItemGroup>
+       </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NetworkMonitorChatRazorLib\NetworkMonitorChatRazorLib-Linux.csproj" />
-  </ItemGroup>
+
+
+        <ItemGroup>
+                <ProjectReference Include="..\NetworkMonitorChatRazorLib\NetworkMonitorChatRazorLib-Linux.csproj" />
+        </ItemGroup>
 
 </Project>
