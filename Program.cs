@@ -23,6 +23,7 @@ builder.Configuration.AddConfiguration(configuration);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddServerSideBlazor(options =>
 {
     options.DetailedErrors = true;

@@ -1,6 +1,11 @@
 @page "/"
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using NetworkMonitorBlazor
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    var pathBase = HttpContextAccessor.HttpContext?.Request?.PathBase.Value ?? "";
+    var baseHref = string.IsNullOrEmpty(pathBase) ? "/" : $"{pathBase}/";
+}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,10 +13,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quantum Network Monitor Assistant</title>
-    @{
-        var pathBase = Context?.Request?.PathBase.Value ?? "";
-        var baseHref = string.IsNullOrEmpty(pathBase) ? "/" : $"{pathBase}/";
-    }
     <base href="@baseHref" />
     <link href="@(baseHref)_framework/scoped.styles.css" rel="stylesheet" />
     <link href="@(baseHref)css/chat.css" rel="stylesheet" />
